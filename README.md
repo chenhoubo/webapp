@@ -105,3 +105,11 @@ npm run serve
 [MIT](https://github.com/gcddblue/vue-admin-webapp/blob/master/LICENSE)
 
 Copyright (c) 2019 gcddblu
+
+
+1、git add .（文件添加到暂存区）
+2、git commit -m ""
+3、git pull origin dev
+4、git push origin dev
+
+
