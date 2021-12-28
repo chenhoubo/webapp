@@ -31,7 +31,7 @@
             <el-input
               placeholder="请输入账号"
               prefix-icon="el-icon-user"
-              v-model="ruleForm.user"
+              v-model="ruleForm.username"
             ></el-input>
           </el-form-item>
           <el-form-item prop="password">
@@ -63,11 +63,11 @@ export default {
       text: '向右滑动',
       showSlide: false,
       ruleForm: {
-        user: 'admin',
+        username: 'admin',
         password: '123456'
       },
       rules: {
-        user: [
+        username: [
           { required: true, message: '请输入用户名', trigger: 'blur' },
           { min: 3, max: 15, message: '长度在3到5个字符', trigger: 'blur' }
         ],
@@ -102,15 +102,12 @@ export default {
       this.$store
         .dispatch('user/_login', this.ruleForm)
         .then(res => {
-          if (!res.data.success) {
-            this.refresh()
-          } else {
-            this.$router.push(this.$route.query.redirect)
-            if (this.notifyObj) {
-              this.notifyObj.close()
-            }
-            this.notifyObj = null
+          console.log('登录的返回:', res)
+          this.$router.push(this.$route.query.redirect)
+          if (this.notifyObj) {
+            this.notifyObj.close()
           }
+          this.notifyObj = null
         })
         .catch(error => {
           this.refresh()

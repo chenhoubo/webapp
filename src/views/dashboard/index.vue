@@ -10,9 +10,9 @@ import userComponent from './user'
 import { mapGetters } from 'vuex'
 export default {
   computed: {
-    ...mapGetters(['userName']),
+    ...mapGetters(['username']),
     componentOn() {
-      if (this.userName === 'admin') {
+      if (this.username === 'admin') {
         return 'adminComponent'
       } else {
         return 'userComponent'

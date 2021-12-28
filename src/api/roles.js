@@ -1,5 +1,5 @@
 import $axios from './index'
 export function getAllRolse() {
-  const url = '/getRoles'
+  const url = '/role/getRoles'
   return $axios.get(url)
 }

@@ -113,7 +113,7 @@ export default {
       this._getPageTab1(val, this.pageSize)
     },
     _getPageTab1(current, size) {
-      getPageTab1({ currentPage: current, pageSize: size })
+      getPageTab1({ current, size })
         .then(res => {
           this.total = res.data.total
           this.tablePage = res.data.tableList

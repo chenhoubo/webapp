@@ -4,8 +4,8 @@ import router, { resetRouter } from '@/router'
 
 const state = {
   token: localStorage.getItem('token') ? localStorage.getItem('token') : '', // 认证凭证'
-  userName: '',
-  roles: [],
+  username: '',
+  menus: [],
   introduce: ''
 }
 const mutations = {
@@ -15,16 +15,16 @@ const mutations = {
   },
   DEL_TOKEN(state) {
     state.token = ''
-    state.userName = ''
-    state.roles = ''
+    state.username = ''
+    state.menus = ''
     state.introduce = ''
     localStorage.removeItem('token')
   },
-  SET_ROLES(state, payload) {
-    state.roles = payload
+  SET_MENUS(state, payload) {
+    state.menus = payload
   },
   SET_NAME(state, payload) {
-    state.userName = payload
+    state.username = payload
   },
   SET_INTRODUCE(state, payload) {
     state.introduce = payload
@@ -36,14 +36,12 @@ const actions = {
     return new Promise((resolve, reject) => {
       login(formdatas)
         .then(res => {
-          if (res.code === 0) {
-            if (res.data.success) {
-              Message.success(res.data.msg)
-              commit('SET_TOKEN', res.data.token)
-            } else {
-              Message.error(res.data.msg)
-            }
+          if (res.code === 200) {
+            Message.success(res.msg)
+            commit('SET_TOKEN', res.data)
             resolve(res)
+          } else {
+            Message.error(res.msg)
           }
         })
         .catch(error => {
@@ -65,13 +63,14 @@ const actions = {
     return new Promise((resolve, reject) => {
       getInfo()
         .then(res => {
-          if (res.code === 0) {
-            const { name, roles, introduce } = res.data
-            commit('SET_ROLES', roles)
-            commit('SET_NAME', name)
+          if (res.code === 200) {
+            const { username, menus, introduce } = res.data
+            commit('SET_MENUS', menus)
+            commit('SET_NAME', username)
             commit('SET_INTRODUCE', introduce)
           } else {
             Message.error(res.msg)
+            reject(res.msg)
           }
           resolve(res.data)
         })

@@ -283,15 +283,15 @@ router.beforeEach(async (to, from, next) => {
     next()
   } else {
     if (store.getters.token) {
-      const hasRoles = store.getters.roles.length > 0
-      if (hasRoles) {
+      const hasMenus = store.getters.menus.length > 0
+      if (hasMenus) {
         next()
       } else {
         try {
-          const { roles } = await store.dispatch('user/_getInfo')
+          const { menus } = await store.dispatch('user/_getInfo')
           const addRoutes = await store.dispatch(
             'permission/getAsyncRoutes',
-            roles
+            menus
           )
           router.addRoutes(addRoutes)
 

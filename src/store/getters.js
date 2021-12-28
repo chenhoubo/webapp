@@ -1,7 +1,7 @@
 const getters = {
   token: state => state.user.token,
-  userName: state => state.user.userName,
-  roles: state => state.user.roles,
+  username: state => state.user.username,
+  menus: state => state.user.menus,
   introduce: state => state.user.introduce,
   routes: state => state.permission.routes,
   addRoutes: state => state.permission.addRoutes,

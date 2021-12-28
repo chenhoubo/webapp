@@ -21,7 +21,7 @@ $axios.interceptors.request.use(
     loading = Loading.service({ text: '拼命加载中' })
     const token = store.getters.token
     if (token) {
-      config.headers.Authorization = token // 请求头部添加token
+      config.headers.auth = token // 请求头部添加token
     }
     return config
   },
@@ -83,9 +83,10 @@ export default {
     return $axios({
       method: 'post',
       url,
-      data: Qs.stringify(data),
+      // data: Qs.stringify(data),
+      data: { ...data },
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+        'Content-Type': 'application/json; charset=UTF-8'
       }
     })
   },
