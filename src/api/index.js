@@ -76,7 +76,6 @@ $axios.interceptors.response.use(
     return Promise.reject(error)
   }
 )
-
 // get，post请求方法
 export default {
   post(url, data) {
