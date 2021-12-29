@@ -3,7 +3,7 @@
     <div class="personal_h">
       <div class="perh_d1">
         <div class="perh_info">
-          <p class="perh_p0">{{ userName }}</p>
+          <p class="perh_p0">{{ username }}</p>
           <div class="chatBox">
             <a href="javascript:;"><i class="iconfont el-icon-weixin"></i></a>
             <a href="javascript:;"><i class="iconfont el-icon-twitter"></i></a>
@@ -62,7 +62,7 @@
 import { mapGetters } from 'vuex'
 export default {
   computed: {
-    ...mapGetters(['userName', 'introduce'])
+    ...mapGetters(['username', 'introduce'])
   }
 }
 </script>

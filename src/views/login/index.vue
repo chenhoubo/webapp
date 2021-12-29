@@ -101,8 +101,7 @@ export default {
     _login() {
       this.$store
         .dispatch('user/_login', this.ruleForm)
-        .then(res => {
-          console.log('登录的返回:', res)
+        .then(() => {
           this.$router.push(this.$route.query.redirect)
           if (this.notifyObj) {
             this.notifyObj.close()

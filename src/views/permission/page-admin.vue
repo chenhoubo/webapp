@@ -5,7 +5,7 @@
         <i class="el-icon-s-opportunity"></i>本页面只有admin权限下显示
       </p>
       <div class="driver_p0">你的权限页面是:</div>
-      <el-tag v-for="item in roles" :key="item">{{ item }}</el-tag>
+      <el-tag v-for="item in menus" :key="item">{{ item }}</el-tag>
     </el-card>
   </div>
 </template>
@@ -14,7 +14,7 @@
 import { mapGetters } from 'vuex'
 export default {
   computed: {
-    ...mapGetters(['roles'])
+    ...mapGetters(['menus'])
   }
 }
 </script>
