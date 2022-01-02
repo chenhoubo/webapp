@@ -5,6 +5,7 @@ import router, { resetRouter } from '@/router'
 const state = {
   token: localStorage.getItem('token') ? localStorage.getItem('token') : '', // 认证凭证'
   username: '',
+  name: '',
   menus: [],
   introduce: ''
 }
@@ -16,6 +17,7 @@ const mutations = {
   DEL_TOKEN(state) {
     state.token = ''
     state.username = ''
+    state.name = ''
     state.menus = ''
     state.introduce = ''
     localStorage.removeItem('token')
@@ -25,6 +27,9 @@ const mutations = {
   },
   SET_NAME(state, payload) {
     state.username = payload
+  },
+  SET_REAL_NAME(state, payload) {
+    state.name = payload
   },
   SET_INTRODUCE(state, payload) {
     state.introduce = payload
@@ -64,9 +69,10 @@ const actions = {
       getInfo()
         .then(res => {
           if (res.code === 200) {
-            const { username, menus, introduce } = res.data
+            const { username, name, menus, introduce } = res.data
             commit('SET_MENUS', menus)
             commit('SET_NAME', username)
+            commit('SET_REAL_NAME', name)
             commit('SET_INTRODUCE', introduce)
           } else {
             Message.error(res.msg)

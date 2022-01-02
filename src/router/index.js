@@ -81,6 +81,24 @@ export const currencyRoutes = [
 /*动态添加routers*/
 export const asyncRoutes = [
   {
+    path: '/system',
+    name: 'System',
+    component: Layout,
+    redirect: '/system/menu',
+    meta: {
+      title: '系统设置',
+      icon: 'el-icon-setting'
+    },
+    children: [
+      {
+        path: 'menu',
+        name: 'Menu',
+        component: () => import('@/views/system/menu-Setting'),
+        meta: { title: '菜单管理', icon: 'el-icon-menu' }
+      }
+    ]
+  },
+  {
     path: '/permission',
     name: 'Permission',
     component: Layout,
@@ -252,6 +270,23 @@ export const asyncRoutes = [
     meta: { icon: 'el-icon-link', title: '项目链接' }
   },
   NavTest,
+  {
+    path: '/other',
+    component: Layout,
+    name: 'Other',
+    redirect: '/other/index',
+    meta: {
+      title: '其他'
+    },
+    children: [
+      {
+        path: 'index',
+        name: 'Other-Index',
+        component: () => import('@/views/other/index'),
+        meta: { title: '其他', icon: 'el-icon-s-release' }
+      }
+    ]
+  },
   {
     path: '*',
     name: '*404',

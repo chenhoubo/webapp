@@ -3,7 +3,7 @@
     <el-dropdown class="userDd">
       <div class="userDrop">
         <span class="userDrop_text"
-          >{{ username }}<i class="el-icon-caret-bottom"></i
+          >{{ name }}<i class="el-icon-caret-bottom"></i
         ></span>
         <img src="./user01.jpg" alt="user" />
       </div>
@@ -28,7 +28,7 @@
 import { mapGetters } from 'vuex'
 export default {
   computed: {
-    ...mapGetters(['username'])
+    ...mapGetters(['name'])
   },
   methods: {
     _loginOut() {
