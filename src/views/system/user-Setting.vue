@@ -21,7 +21,7 @@
             :key="item.value"
           ></el-option>
         </el-select>
-        <el-button type="primary" icon="el-icon-search" @click="searchTab()"
+        <el-button type="primary" icon="el-icon-search" @click="getPageData()"
           >搜索</el-button
         >
         <el-button
@@ -37,25 +37,25 @@
         row-key="id"
         border
         stripe
-        :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
       >
         <el-table-column
           prop="id"
           label="编号"
           sortable
-          width="280"
+          width="240"
         ></el-table-column>
         <el-table-column
-          prop="updateTime"
-          label="更新时间"
+          prop="role"
+          label="角色编号"
           sortable
-          width="200"
-        >
+          width="240"
+        ></el-table-column>
+        <el-table-column prop="username" label="账号" sortable width="180">
         </el-table-column>
-        <el-table-column prop="name" label="名称" sortable width="180">
+        <el-table-column prop="name" label="姓名" sortable width="180">
         </el-table-column>
-        <el-table-column prop="pageUrl" label="路径"> </el-table-column>
-        <el-table-column prop="component" label="组件"> </el-table-column>
+        <el-table-column prop="count" label="访问次数"> </el-table-column>
+        <el-table-column prop="tel" label="电话"> </el-table-column>
         <el-table-column prop="status" label="状态" width="90">
           <template slot-scope="scope">
             <el-tag :type="scope.row.status | tagClass">{{
@@ -69,6 +69,9 @@
               type="primary"
               @click="editTable(scope.$index, scope.row)"
               >编辑</el-button
+            >
+            <el-button type="warning" @click="toDetail(scope.row)" disabled
+              >详情</el-button
             >
             <el-button
               type="danger"
@@ -107,61 +110,65 @@
             :disabled="true"
           ></el-input>
         </el-form-item>
-        <el-form-item label="名称" prop="name">
+        <el-form-item label="姓名" prop="name">
           <el-input type="text" v-model="formData.name"></el-input>
         </el-form-item>
-        <el-form-item label="父级菜单" prop="pid">
-          <el-select v-model="formData.pid" placeholde="请选择父级菜单">
+        <el-form-item label="用户角色" prop="role">
+          <el-select v-model="formData.role" placeholde="请选择用户角色">
             <el-option
-              v-for="item in pids"
+              v-for="item in roles"
               :label="item.name"
               :value="item.id"
               :key="item.id"
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="meta">
-          <el-input
-            type="textarea"
-            v-model="formData.meta"
-            @input="changeMeta($event)"
-            placeholder="非必填"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="redirect">
-          <el-input
-            type="text"
-            v-model="formData.redirect"
-            placeholder="非必填"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="component">
-          <el-input
-            type="text"
-            v-model="formData.component"
-            placeholder="非必填"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="pageUrl" prop="pageUrl">
-          <el-input type="text" v-model="formData.pageUrl"></el-input>
-        </el-form-item>
-        <el-form-item label="是否隐藏" prop="hidden">
-          <el-select v-model="formData.hidden" placeholde="请选择是否隐藏">
+        <el-form-item label="用户性别">
+          <el-select v-model="formData.gender" placeholde="请选择用户性别">
             <el-option
-              v-for="(item, index) in hiddens"
+              v-for="item in genders"
               :label="item.label"
               :value="item.value"
-              :key="index"
+              :key="item.value"
             ></el-option>
           </el-select>
+        </el-form-item>
+        <el-form-item label="电话" prop="tel">
+          <el-input
+            type="number"
+            maxlength="11"
+            v-model="formData.tel"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="年龄">
+          <el-input
+            type="number"
+            maxlength="3"
+            v-model="formData.age"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="风格">
+          <el-input type="text" v-model="formData.style"></el-input>
+        </el-form-item>
+        <el-form-item label="描述">
+          <el-input type="text" v-model="formData.introduce"></el-input>
+        </el-form-item>
+        <el-form-item label="地址">
+          <el-input type="text" v-model="formData.address"></el-input>
+        </el-form-item>
+        <el-form-item label="登录账号" prop="username">
+          <el-input type="text" v-model="formData.username"></el-input>
+        </el-form-item>
+        <el-form-item label="密码">
+          <el-input type="text" v-model="formData.password"></el-input>
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-select v-model="formData.status" placeholde="请选择状态">
             <el-option
-              v-for="(item, index) in options"
+              v-for="item in options"
               :label="item.label"
               :value="item.value"
-              :key="index"
+              :key="item.value"
             ></el-option>
           </el-select>
         </el-form-item>
@@ -177,13 +184,13 @@
 </template>
 
 <script>
-import { getAll, update, save, del } from '@/api/menu'
+import { page, update, save, del } from '@/api/user'
+import { getAllRolse } from '@/api/roles'
 export default {
   data() {
     return {
       tableData: [],
       allList: [],
-      schArr: [],
       sch_id: '',
       sch_status: null,
       currentPage: 1,
@@ -195,34 +202,36 @@ export default {
       editType: '',
       options: [
         { label: '启用', value: 0 },
-        { label: '关闭', value: 1 }
+        { label: '禁用', value: 1 }
       ],
-      pids: [{ name: '一级目录', id: '0' }],
+      roles: [],
       hiddens: [
         { label: '否', value: false },
         { label: '是', value: true }
       ],
+      genders: [
+        { label: '男', value: '男' },
+        { label: '女', value: '女' }
+      ],
       rowIndex: 0,
       rules: {
         name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
-        pageUrl: [{ required: true, message: '请输入路径', trigger: 'blur' }],
-        hidden: [
-          { required: true, message: '请选择隐藏状态', trigger: 'change' }
-        ],
-        status: [
-          { required: true, message: '请选择订单状态', trigger: 'change' }
-        ]
+        tel: [{ required: true, message: '请输入电话', trigger: 'blur' }],
+        role: [{ required: true, message: '请选择角色', trigger: 'blur' }],
+        username: [{ required: true, message: '请选择角色', trigger: 'blur' }],
+        status: [{ required: true, message: '请选择状态', trigger: 'change' }]
       }
     }
   },
   created() {
-    this._getPageTab2()
+    this.getPageData()
+    this.getRoles()
   },
   filters: {
     statusText(val) {
       if (val === undefined) return
       if (val === 0) {
-        return '启用'
+        return '激活'
       } else if (val === 1) {
         return '禁用'
       }
@@ -249,53 +258,40 @@ export default {
       this.currentPage = val
       this.getPageData()
     },
-    _getPageTab2() {
-      getAll()
+    getPageData() {
+      let param = {
+        current: this.currentPage,
+        size: this.pageSize,
+        id: this.sch_id,
+        status: this.sch_status
+      }
+      page(param)
         .then(res => {
-          this.allList = res.data
-          this.schArr = res.data
-          this.pids = this.pids.concat(res.data)
-          this.getPageData()
-          this.total = res.data.length
+          this.tableData = res.data.records
+          this.allList = res.data.records
+          this.total = res.total
         })
         .catch(error => {
           this.$message.error(error.message)
         })
     },
-    getPageData() {
-      let start = (this.currentPage - 1) * this.pageSize
-      let end = start + this.pageSize
-      this.tableData = this.schArr.slice(start, end)
-    },
-    // 查找
-    searchTab() {
-      let arrList = []
-      for (let item of this.allList) {
-        if (
-          this.sch_id.trim() === '' &&
-          (this.sch_status === null || this.sch_status === '')
-        ) {
-          arrList = this.allList
-          break
-        } else if (
-          item.id.startsWith(this.sch_id) &&
-          (this.sch_status === null || this.sch_status === ''
-            ? true
-            : item.status === this.sch_status)
-        ) {
-          let obj = Object.assign({}, item)
-          arrList.push(obj)
-        }
-      }
-      this.schArr = arrList
-      this.total = arrList.length
-      this.currentPage = 1
-      this.pageSize = 10
-      this.getPageData()
+    getRoles() {
+      getAllRolse()
+        .then(res => {
+          this.roles = res.data.map(item => {
+            return {
+              id: item.id,
+              name: item.name
+            }
+          })
+        })
+        .catch(err => {
+          this.$message.error(err.message)
+        })
     },
     // add
     addTab() {
-      this.formData = {}
+      this.formData = { count: 0 }
       this.diaIsShow = true
       this.editType = 'add'
       this.$nextTick(() => {
@@ -304,26 +300,41 @@ export default {
     },
     // 删除
     toDelete(row) {
-      const param = { id: row.id }
-      del(param)
-        .then(res => {
-          if (res.code == 200) {
-            this.$notify({
-              title: '成功',
-              message: '已删除该菜单',
-              type: 'success'
+      this.$confirm('此操作将永久删除相关数据, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          const param = { id: row.id }
+          del(param)
+            .then(res => {
+              if (res.code == 200) {
+                this.$notify({
+                  title: '成功',
+                  message: '已删除该用户',
+                  type: 'success'
+                })
+                this.getPageData()
+              }
             })
-            this._getPageTab2()
-          }
+            .catch(err => {
+              this.$message.error(err)
+            })
         })
-        .catch(err => {
-          this.$message.error(err)
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
         })
+    },
+    toDetail(row) {
+      this.formData = Object.assign({}, row)
     },
     // 编辑
     editTable(index, row) {
       this.formData = Object.assign({}, row)
-      this.formData.meta = JSON.stringify(this.formData.meta)
       this.editType = 'update'
       this.diaIsShow = true
       this.$nextTick(() => {
@@ -337,24 +348,19 @@ export default {
           if (type === 'update') {
             // 改变整个表格数据
             let start = (this.currentPage - 1) * this.pageSize
-            this.allList[start + this.rowIndex] = Object.assign(
+            this.tableData[start + this.rowIndex] = Object.assign(
               {},
               this.formData
             )
-            delete this.allList[start + this.rowIndex].updateTime
-            delete this.allList[start + this.rowIndex].children
-            this.allList[start + this.rowIndex].meta = JSON.parse(
-              this.formData.meta
-            )
-            update(this.allList[start + this.rowIndex])
+            update(this.tableData[start + this.rowIndex])
               .then(res => {
                 if (res.code == 200) {
                   this.$notify({
                     title: '成功',
-                    message: '菜单修改成功',
+                    message: '用户修改成功',
                     type: 'success'
                   })
-                  this._getPageTab2()
+                  this.getPageData()
                 }
               })
               .catch(err => {
@@ -364,29 +370,23 @@ export default {
             save(Object.assign({}, this.formData))
               .then(res => {
                 if (res.code == 200) {
-                  this.tableData.unshift(Object.assign({}, this.formData))
-                  this.allList.push(Object.assign({}, this.formData))
                   this.$notify({
                     title: '成功',
-                    message: '权限添加成功',
+                    message: '用户添加成功',
                     type: 'success'
                   })
+                  this.getPageData()
                 }
               })
               .catch(error => {
                 this.$message.error(error)
               })
           }
-          // location.reload()
           this.diaIsShow = false
         } else {
           return
         }
       })
-    },
-    changeMeta() {
-      //强制刷新
-      this.$forceUpdate()
     }
   }
 }

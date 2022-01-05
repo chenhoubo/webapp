@@ -95,6 +95,12 @@ export const asyncRoutes = [
         name: 'Menu',
         component: () => import('@/views/system/menu-Setting'),
         meta: { title: '菜单管理', icon: 'el-icon-menu' }
+      },
+      {
+        path: 'user',
+        name: 'User',
+        component: () => import('@/views/system/user-Setting'),
+        meta: { title: '用户管理', icon: 'el-icon-user' }
       }
     ]
   },
@@ -112,14 +118,14 @@ export const asyncRoutes = [
         path: 'page-user',
         name: 'PageUser',
         component: () => import('@/views/permission/page-user'),
-        meta: { title: '用户页面', icon: 'el-icon-user' }
+        meta: { title: '用户权限', icon: 'el-icon-user' }
       },
       {
         path: 'page-admin',
         name: 'PageAdmin',
         component: () => import('@/views/permission/page-admin'),
         meta: {
-          title: '管理员页面',
+          title: '管理员权限',
           icon: 'el-icon-user-solid'
         }
       },
@@ -160,12 +166,13 @@ export const asyncRoutes = [
     component: Layout,
     name: 'Icons',
     redirect: '/icons/index',
+    meta: { title: 'Icons', icon: 'el-icon-picture-outline' },
     children: [
       {
         path: 'index',
         name: 'Icons-index',
         component: () => import('@/views/icons'),
-        meta: { title: 'Icons图标', icon: 'el-icon-picture-outline' }
+        meta: { title: 'Icons图标' }
       }
     ]
   },
@@ -265,7 +272,7 @@ export const asyncRoutes = [
     ]
   },
   {
-    path: 'https://github.com/gcddblue/vue-admin-webapp',
+    path: 'https://github.com/chenhoubo/webapp',
     name: 'Github',
     meta: { icon: 'el-icon-link', title: '项目链接' }
   },
