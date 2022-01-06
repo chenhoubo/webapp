@@ -63,12 +63,15 @@
             }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="300">
+        <el-table-column label="操作" width="350">
           <template slot-scope="scope">
             <el-button
               type="primary"
               @click="editTable(scope.$index, scope.row)"
               >编辑</el-button
+            >
+            <el-button type="success" @click="toResetPas(scope.row)"
+              >重置用户密码</el-button
             >
             <el-button type="warning" @click="toDetail(scope.row)" disabled
               >详情</el-button
@@ -159,9 +162,6 @@
         <el-form-item label="登录账号" prop="username">
           <el-input type="text" v-model="formData.username"></el-input>
         </el-form-item>
-        <el-form-item label="密码">
-          <el-input type="text" v-model="formData.password"></el-input>
-        </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-select v-model="formData.status" placeholde="请选择状态">
             <el-option
@@ -184,7 +184,7 @@
 </template>
 
 <script>
-import { page, update, save, del } from '@/api/user'
+import { page, update, save, del, resetPas } from '@/api/user'
 import { getAllRolse } from '@/api/roles'
 export default {
   data() {
@@ -326,6 +326,36 @@ export default {
           this.$message({
             type: 'info',
             message: '已取消删除'
+          })
+        })
+    },
+    toResetPas(row) {
+      this.$confirm('此操作将重置用户密码为默认密码, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          const param = { id: row.id }
+          resetPas(param)
+            .then(res => {
+              if (res.code == 200) {
+                this.$notify({
+                  title: '成功',
+                  message: '密码重置成功',
+                  type: 'success'
+                })
+                this.getPageData()
+              }
+            })
+            .catch(err => {
+              this.$message.error(err)
+            })
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消重置'
           })
         })
     },

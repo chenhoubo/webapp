@@ -19,3 +19,8 @@ export function del(params) {
   const url = '/user/delete'
   return $axios.get(url, params)
 }
+
+export function resetPas(params) {
+  const url = '/user/resetPas'
+  return $axios.get(url, params)
+}

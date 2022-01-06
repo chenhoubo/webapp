@@ -35,6 +35,9 @@ export default {
     activeMenu() {
       return this.$route.path
     }
+  },
+  mounted() {
+    // console.log('routes:', this.routes)
   }
 }
 </script>

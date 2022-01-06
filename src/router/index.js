@@ -81,6 +81,24 @@ export const currencyRoutes = [
 /*动态添加routers*/
 export const asyncRoutes = [
   {
+    path: '/product',
+    name: 'Product',
+    component: Layout,
+    redirect: '/product/manage',
+    meta: {
+      title: '产品管理',
+      icon: 'el-icon-s-cooperation'
+    },
+    children: [
+      {
+        path: 'manage',
+        name: 'Manage',
+        component: () => import('@/views/product/manage'),
+        meta: { title: '产品列表', icon: 'el-icon-s-order' }
+      }
+    ]
+  },
+  {
     path: '/system',
     name: 'System',
     component: Layout,
