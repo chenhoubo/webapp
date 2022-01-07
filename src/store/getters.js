@@ -16,6 +16,7 @@ const getters = {
     }
   },
   msgIsShow: state => state.app.msgIsShow,
+  isMsg: state => state.app.isMsg,
   showDriver: state => state.app.showDriver
 }
 export default getters

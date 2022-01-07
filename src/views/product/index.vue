@@ -40,22 +40,22 @@
       >
         <el-table-column
           prop="id"
-          label="编号"
+          label="产品编号"
           sortable
           width="240"
         ></el-table-column>
-        <el-table-column
-          prop="role"
-          label="角色编号"
-          sortable
-          width="240"
-        ></el-table-column>
-        <el-table-column prop="username" label="账号" sortable width="180">
+        <el-table-column prop="name" label="名称" sortable width="180">
         </el-table-column>
-        <el-table-column prop="name" label="姓名" sortable width="180">
+        <el-table-column prop="price" label="价格"> </el-table-column>
+        <el-table-column prop="count" label="剩余数量"> </el-table-column>
+        <el-table-column prop="manufacturer" label="厂家"> </el-table-column>
+        <el-table-column prop="type" label="审核结果" width="90">
+          <template slot-scope="scope">
+            <el-tag :type="scope.row.type | typeClass">{{
+              scope.row.type | typeText
+            }}</el-tag>
+          </template>
         </el-table-column>
-        <el-table-column prop="count" label="访问次数"> </el-table-column>
-        <el-table-column prop="tel" label="电话"> </el-table-column>
         <el-table-column prop="status" label="状态" width="90">
           <template slot-scope="scope">
             <el-tag :type="scope.row.status | tagClass">{{
@@ -69,9 +69,6 @@
               type="primary"
               @click="editTable(scope.$index, scope.row)"
               >编辑</el-button
-            >
-            <el-button type="success" @click="toResetPas(scope.row)"
-              >重置用户密码</el-button
             >
             <el-button type="warning" @click="toDetail(scope.row)" disabled
               >详情</el-button
@@ -106,63 +103,46 @@
         :rules="rules"
         label-width="140px"
       >
-        <el-form-item label="编号">
+        <el-form-item label="系统编号">
           <el-input
             type="text"
             v-model="formData.id"
             :disabled="true"
           ></el-input>
         </el-form-item>
-        <el-form-item label="姓名" prop="name">
+        <el-form-item label="名称" prop="name">
           <el-input type="text" v-model="formData.name"></el-input>
         </el-form-item>
-        <el-form-item label="用户角色" prop="role">
-          <el-select v-model="formData.role" placeholde="请选择用户角色">
+        <el-form-item label="审核者" prop="examine">
+          <el-select v-model="formData.examine" placeholde="请选择管理员">
             <el-option
-              v-for="item in roles"
+              v-for="item in users"
               :label="item.name"
               :value="item.id"
               :key="item.id"
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="用户性别">
-          <el-select v-model="formData.gender" placeholde="请选择用户性别">
-            <el-option
-              v-for="item in genders"
-              :label="item.label"
-              :value="item.value"
-              :key="item.value"
-            ></el-option>
-          </el-select>
+        <el-form-item label="价格" prop="price">
+          <el-input type="text" v-model="formData.price"></el-input>
         </el-form-item>
-        <el-form-item label="电话" prop="tel">
-          <el-input
-            type="number"
-            maxlength="11"
-            v-model="formData.tel"
-          ></el-input>
+        <el-form-item label="数量" prop="count">
+          <el-input type="text" v-model="formData.count"></el-input>
         </el-form-item>
-        <el-form-item label="年龄">
-          <el-input
-            type="number"
-            maxlength="3"
-            v-model="formData.age"
-          ></el-input>
+        <el-form-item label="型号" prop="model">
+          <el-input type="text" v-model="formData.model"></el-input>
         </el-form-item>
-        <el-form-item label="风格">
-          <el-input type="text" v-model="formData.style"></el-input>
+        <el-form-item label="厂商" prop="manufacturer">
+          <el-input type="text" v-model="formData.manufacturer"></el-input>
         </el-form-item>
-        <el-form-item label="描述">
+        <el-form-item label="描述" prop="introduce">
           <el-input type="text" v-model="formData.introduce"></el-input>
         </el-form-item>
-        <el-form-item label="地址">
-          <el-input type="text" v-model="formData.address"></el-input>
-        </el-form-item>
-        <el-form-item label="登录账号" prop="username">
-          <el-input type="text" v-model="formData.username"></el-input>
-        </el-form-item>
-        <el-form-item label="状态" prop="status">
+        <el-form-item
+          label="产品状态"
+          prop="status"
+          v-show="editType == 'update' && formData.type == 1"
+        >
           <el-select v-model="formData.status" placeholde="请选择状态">
             <el-option
               v-for="item in options"
@@ -184,8 +164,13 @@
 </template>
 
 <script>
-import { page, update, save, del, resetPas } from '@/api/user'
-import { getAllRolse } from '@/api/roles'
+import {
+  pageProduct,
+  updateProduct,
+  addProduct,
+  delProduct
+} from '@/api/product'
+import { getUserByRole } from '@/api/user'
 export default {
   data() {
     return {
@@ -201,39 +186,36 @@ export default {
       formData: {},
       editType: '',
       options: [
-        { label: '启用', value: 0 },
-        { label: '禁用', value: 1 }
+        { label: '上架', value: 0 },
+        { label: '下架', value: 1 }
       ],
-      roles: [],
-      hiddens: [
-        { label: '否', value: false },
-        { label: '是', value: true }
-      ],
-      genders: [
-        { label: '男', value: '男' },
-        { label: '女', value: '女' }
-      ],
+      users: [],
       rowIndex: 0,
       rules: {
         name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
-        tel: [{ required: true, message: '请输入电话', trigger: 'blur' }],
-        role: [{ required: true, message: '请选择角色', trigger: 'blur' }],
-        username: [{ required: true, message: '请选择角色', trigger: 'blur' }],
+        examine: [{ required: true, message: '请选择审核者', trigger: 'blur' }],
+        price: [{ required: true, message: '请输入价格', trigger: 'blur' }],
+        count: [{ required: true, message: '请输入数量', trigger: 'blur' }],
+        model: [{ required: true, message: '请输入型号', trigger: 'blur' }],
+        manufacturer: [
+          { required: true, message: '请输入厂商信息', trigger: 'blur' }
+        ],
+        introduce: [{ required: true, message: '请输入描述', trigger: 'blur' }],
         status: [{ required: true, message: '请选择状态', trigger: 'change' }]
       }
     }
   },
   created() {
     this.getPageData()
-    this.getRoles()
+    this.getUsers()
   },
   filters: {
     statusText(val) {
       if (val === undefined) return
       if (val === 0) {
-        return '激活'
+        return '已上架'
       } else if (val === 1) {
-        return '禁用'
+        return '已下架'
       }
     },
     tagClass(val) {
@@ -242,14 +224,40 @@ export default {
         return 'success'
       } else if (val === 1) {
         return 'danger'
-        // } else if (val === 2) {
-        //   return 'warning'
-        // } else {
-        //   return 'info'
+      }
+    },
+    typeText(val) {
+      if (val === undefined) return
+      if (val === 0) {
+        return '审核中'
+      } else if (val === 1) {
+        return '通过'
+      } else if (val === 2) {
+        return '未通过'
+      }
+    },
+    typeClass(val) {
+      if (val === undefined) return
+      if (val === 0) {
+        return 'warning'
+      } else if (val === 1) {
+        return 'success'
+      } else if (val === 2) {
+        return 'danger'
       }
     }
   },
   methods: {
+    getUsers() {
+      let param = { id: '1479296185101172737' }
+      getUserByRole(param)
+        .then(res => {
+          this.users = res.data
+        })
+        .catch(err => {
+          this.$message.error(err.message)
+        })
+    },
     handleSize(val) {
       this.pageSize = val
       this.getPageData()
@@ -265,7 +273,7 @@ export default {
         id: this.sch_id,
         status: this.sch_status
       }
-      page(param)
+      pageProduct(param)
         .then(res => {
           this.tableData = res.data.records
           this.allList = res.data.records
@@ -275,23 +283,10 @@ export default {
           this.$message.error(error.message)
         })
     },
-    getRoles() {
-      getAllRolse()
-        .then(res => {
-          this.roles = res.data.map(item => {
-            return {
-              id: item.id,
-              name: item.name
-            }
-          })
-        })
-        .catch(err => {
-          this.$message.error(err.message)
-        })
-    },
     // add
     addTab() {
-      this.formData = { count: 0 }
+      // 初始化审核中
+      this.formData = { type: 0, status: 1 }
       this.diaIsShow = true
       this.editType = 'add'
       this.$nextTick(() => {
@@ -307,12 +302,12 @@ export default {
       })
         .then(() => {
           const param = { id: row.id }
-          del(param)
+          delProduct(param)
             .then(res => {
               if (res.code == 200) {
                 this.$notify({
                   title: '成功',
-                  message: '已删除该用户',
+                  message: '已删除该产品',
                   type: 'success'
                 })
                 this.getPageData()
@@ -326,36 +321,6 @@ export default {
           this.$message({
             type: 'info',
             message: '已取消删除'
-          })
-        })
-    },
-    toResetPas(row) {
-      this.$confirm('此操作将重置用户密码为默认密码, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => {
-          const param = { id: row.id }
-          resetPas(param)
-            .then(res => {
-              if (res.code == 200) {
-                this.$notify({
-                  title: '成功',
-                  message: '密码重置成功',
-                  type: 'success'
-                })
-                this.getPageData()
-              }
-            })
-            .catch(err => {
-              this.$message.error(err)
-            })
-        })
-        .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消重置'
           })
         })
     },
@@ -382,12 +347,12 @@ export default {
               {},
               this.formData
             )
-            update(this.tableData[start + this.rowIndex])
+            updateProduct(this.tableData[start + this.rowIndex])
               .then(res => {
                 if (res.code == 200) {
                   this.$notify({
                     title: '成功',
-                    message: '用户修改成功',
+                    message: '产品修改成功',
                     type: 'success'
                   })
                   this.getPageData()
@@ -397,12 +362,12 @@ export default {
                 this.$message.error(err)
               })
           } else {
-            save(Object.assign({}, this.formData))
+            addProduct(Object.assign({}, this.formData))
               .then(res => {
                 if (res.code == 200) {
                   this.$notify({
                     title: '成功',
-                    message: '用户添加成功',
+                    message: '产品添加成功',
                     type: 'success'
                   })
                   this.getPageData()

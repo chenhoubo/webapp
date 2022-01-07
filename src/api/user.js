@@ -24,3 +24,13 @@ export function resetPas(params) {
   const url = '/user/resetPas'
   return $axios.get(url, params)
 }
+
+export function getUserByRole(params) {
+  const url = '/user/getUserByRole'
+  return $axios.get(url, params)
+}
+
+export function getMsgList() {
+  const url = '/user/getMsgList'
+  return $axios.get(url)
+}

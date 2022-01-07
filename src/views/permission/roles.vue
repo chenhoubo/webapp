@@ -134,7 +134,7 @@ export default {
         })
     },
     isAdmin(row) {
-      if (row.value === 'admin' || row.value === 'user') return true
+      if (row.value === 'admin' || row.value === 'manager') return true
       else return false
     },
     deleteRoles(index) {

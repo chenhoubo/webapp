@@ -84,16 +84,16 @@ export const asyncRoutes = [
     path: '/product',
     name: 'Product',
     component: Layout,
-    redirect: '/product/manage',
+    redirect: '/product/index',
     meta: {
       title: '产品管理',
       icon: 'el-icon-s-cooperation'
     },
     children: [
       {
-        path: 'manage',
-        name: 'Manage',
-        component: () => import('@/views/product/manage'),
+        path: 'index',
+        name: 'Product-index',
+        component: () => import('@/views/product/index'),
         meta: { title: '产品列表', icon: 'el-icon-s-order' }
       }
     ]
@@ -110,13 +110,13 @@ export const asyncRoutes = [
     children: [
       {
         path: 'menu',
-        name: 'Menu',
+        name: 'System-menu',
         component: () => import('@/views/system/menu-Setting'),
         meta: { title: '菜单管理', icon: 'el-icon-menu' }
       },
       {
         path: 'user',
-        name: 'User',
+        name: 'System-user',
         component: () => import('@/views/system/user-Setting'),
         meta: { title: '用户管理', icon: 'el-icon-user' }
       }

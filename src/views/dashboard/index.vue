@@ -12,7 +12,7 @@ export default {
   computed: {
     ...mapGetters(['rolevalue']),
     componentOn() {
-      if (this.rolevalue === 'admin') {
+      if (this.rolevalue === 'admin' || this.rolevalue === 'manager') {
         return 'adminComponent'
       } else {
         return 'userComponent'
