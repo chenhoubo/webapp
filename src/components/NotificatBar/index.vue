@@ -41,6 +41,7 @@ export default {
         this.msgList = res.data.map(item => {
           return {
             link: '/product/index',
+            content: '新增商品: ' + item.title + ',需要你审核',
             ...item
           }
         })

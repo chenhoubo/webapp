@@ -73,13 +73,13 @@
             <el-button type="success" @click="toResetPas(scope.row)"
               >重置用户密码</el-button
             >
-            <el-button type="warning" @click="toDetail(scope.row)" disabled
+            <el-button type="warning" @click="toDetail(scope.row)"
               >详情</el-button
             >
             <el-button
               type="danger"
               @click="toDelete(scope.row)"
-              :disabled="scope.row.status !== 3 ? false : true"
+              :disabled="rolevalue === 'admin' ? false : true"
               >删除</el-button
             >
           </template>
@@ -180,13 +180,48 @@
         </el-form-item>
       </el-form>
     </el-dialog>
+    <el-dialog title="详情" :visible.sync="detailIsShow" class="diaForm">
+      <el-descriptions :title="formData.name">
+        <el-descriptions-item label="用户编号">
+          {{ formData.id }}
+        </el-descriptions-item>
+        <el-descriptions-item label="用户角色">
+          {{ formData.roleName }}
+        </el-descriptions-item>
+        <el-descriptions-item label="用户性别">
+          {{ formData.gender }}
+        </el-descriptions-item>
+        <el-descriptions-item label="电话">
+          {{ formData.tel }}
+        </el-descriptions-item>
+        <el-descriptions-item label="年龄">
+          {{ formData.age }}
+        </el-descriptions-item>
+        <el-descriptions-item label="风格">
+          {{ formData.style }}
+        </el-descriptions-item>
+        <el-descriptions-item label="描述">
+          {{ formData.introduce }}
+        </el-descriptions-item>
+        <el-descriptions-item label="地址">
+          {{ formData.address }}
+        </el-descriptions-item>
+        <el-descriptions-item label="状态">
+          {{ formData.status | statusText }}
+        </el-descriptions-item>
+      </el-descriptions>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { page, update, save, del, resetPas } from '@/api/user'
 import { getAllRolse } from '@/api/roles'
+import { mapGetters } from 'vuex'
 export default {
+  computed: {
+    ...mapGetters(['rolevalue'])
+  },
   data() {
     return {
       tableData: [],
@@ -198,6 +233,7 @@ export default {
       total: 0,
       pageSizes: [10, 20, 30, 40],
       diaIsShow: false,
+      detailIsShow: false,
       formData: {},
       editType: '',
       options: [
@@ -361,6 +397,15 @@ export default {
     },
     toDetail(row) {
       this.formData = Object.assign({}, row)
+      let role = this.roles.filter(item => {
+        return item.id == row.role
+      })
+      if (role.length == 1) {
+        this.formData.roleName = role[0].name
+      } else {
+        this.formData.roleName = '不详'
+      }
+      this.detailIsShow = true
     },
     // 编辑
     editTable(index, row) {

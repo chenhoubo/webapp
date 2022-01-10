@@ -37,6 +37,8 @@ import {
   Tree,
   Upload,
   Carousel,
+  Descriptions,
+  DescriptionsItem,
   CarouselItem
 } from 'element-ui'
 Message.install = () => {
@@ -87,3 +89,5 @@ Vue.use(Tree)
 Vue.use(Upload)
 Vue.use(Carousel)
 Vue.use(CarouselItem)
+Vue.use(Descriptions)
+Vue.use(DescriptionsItem)

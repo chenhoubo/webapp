@@ -102,7 +102,8 @@ export default {
       this.$store
         .dispatch('user/_login', this.ruleForm)
         .then(() => {
-          this.$router.push(this.$route.query.redirect)
+          console.log('this.$route.query:', this.$route.query)
+          this.$router.push(this.$route.query.redirect).catch(() => {})
           if (this.notifyObj) {
             this.notifyObj.close()
           }

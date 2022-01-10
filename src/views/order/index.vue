@@ -79,12 +79,6 @@
               :disabled="scope.row.status !== 3 ? false : true"
               >删除</el-button
             >
-            <el-button
-              v-show="scope.row.isExamine"
-              type="success"
-              @click="toExamine(scope.row)"
-              >审核</el-button
-            >
           </template>
         </el-table-column>
       </el-table>
@@ -198,11 +192,6 @@
           {{ formData.type | typeText }}
         </el-descriptions-item>
       </el-descriptions>
-      <el-row v-show="examineIsShow">
-        <el-button type="success" @click="examined(1)">同意</el-button>
-        <el-button type="primary" disabled>转发</el-button>
-        <el-button type="danger" @click="examined(2)">拒绝</el-button>
-      </el-row>
     </el-dialog>
   </div>
 </template>
@@ -228,7 +217,6 @@ export default {
       pageSizes: [10, 20, 30, 40],
       diaIsShow: false,
       detailIsShow: false,
-      examineIsShow: false,
       formData: {},
       editType: '',
       options: [
@@ -335,18 +323,8 @@ export default {
       }
       pageProduct(param)
         .then(res => {
-          let list = res.data.records.map(item => {
-            if (this.msgList.indexOf(item.id) > -1) {
-              item.isExamine = true
-            } else {
-              item.isExamine = false
-            }
-            return {
-              ...item
-            }
-          })
-          this.tableData = list
-          this.allList = list
+          this.tableData = res.data.records
+          this.allList = res.data.records
           this.total = res.data.total
         })
         .catch(error => {
@@ -398,11 +376,6 @@ export default {
       this.formData = Object.assign({}, row)
       this.detailIsShow = true
     },
-    toExamine(row) {
-      this.formData = Object.assign({}, row)
-      this.detailIsShow = true
-      this.examineIsShow = true
-    },
     // 编辑
     editTable(index, row) {
       this.formData = Object.assign({}, row)
@@ -416,7 +389,6 @@ export default {
     closeDetail() {
       // console.log('关闭回调')
       this.detailIsShow = false
-      this.examineIsShow = false
       this.formData = {}
     },
     changeTab(form, type) {
@@ -425,7 +397,6 @@ export default {
           if (type === 'update') {
             // 改变整个表格数据
             let start = (this.currentPage - 1) * this.pageSize
-            delete this.formData.isExamine
             this.tableData[start + this.rowIndex] = Object.assign(
               {},
               this.formData
@@ -467,7 +438,6 @@ export default {
       })
     },
     examined(type) {
-      delete this.formData.isExamine
       let item = Object.assign({}, this.formData)
       item.type = type
       // console.log('item', item, type)
@@ -499,7 +469,6 @@ export default {
           })
         })
       this.detailIsShow = false
-      this.examineIsShow = false
       this.formData = {}
     }
   }
