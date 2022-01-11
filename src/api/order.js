@@ -14,3 +14,8 @@ export function del(params) {
   const url = '/order/delete'
   return $axios.get(url, params)
 }
+
+export function page(params) {
+  const url = '/order/page'
+  return $axios.post(url, params)
+}

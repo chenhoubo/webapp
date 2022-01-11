@@ -6,6 +6,7 @@ import {
   Form,
   FormItem,
   Input,
+  InputNumber,
   Select,
   Option,
   Message,
@@ -57,6 +58,7 @@ Vue.use(Col)
 Vue.use(Form)
 Vue.use(FormItem)
 Vue.use(Input)
+Vue.use(InputNumber)
 Vue.use(Message)
 Vue.use(MessageBox)
 Vue.use(Notification)

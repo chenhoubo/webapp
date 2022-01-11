@@ -130,10 +130,10 @@
           </el-select>
         </el-form-item>
         <el-form-item label="价格" prop="price">
-          <el-input type="text" v-model="formData.price"></el-input>
+          <el-input type="number" v-model="formData.price"></el-input>
         </el-form-item>
         <el-form-item label="数量" prop="count">
-          <el-input type="text" v-model="formData.count"></el-input>
+          <el-input type="number" v-model="formData.count"></el-input>
         </el-form-item>
         <el-form-item label="型号" prop="model">
           <el-input type="text" v-model="formData.model"></el-input>
@@ -422,6 +422,8 @@ export default {
     changeTab(form, type) {
       this.$refs[form].validate(valid => {
         if (valid) {
+          this.formData.price = +this.formData.price
+          this.formData.count = +this.formData.count
           if (type === 'update') {
             // 改变整个表格数据
             let start = (this.currentPage - 1) * this.pageSize
@@ -477,6 +479,8 @@ export default {
         type: 'warning'
       })
         .then(() => {
+          item.price = +item.price
+          item.count = +item.count
           updateProduct(item)
             .then(res => {
               if (res.code == 200) {

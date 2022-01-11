@@ -40,23 +40,14 @@
       >
         <el-table-column
           prop="id"
-          label="产品编号"
+          label="订单编号"
           sortable
           width="240"
         ></el-table-column>
-        <el-table-column prop="name" label="名称" sortable width="180">
-        </el-table-column>
-        <el-table-column prop="price" label="价格"> </el-table-column>
-        <el-table-column prop="count" label="剩余数量"> </el-table-column>
-        <el-table-column prop="manufacturer" label="厂家"> </el-table-column>
-        <el-table-column prop="type" label="审核结果" width="90">
-          <template slot-scope="scope">
-            <el-tag :type="scope.row.type | typeClass">{{
-              scope.row.type | typeText
-            }}</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="status" label="状态" width="90">
+        <el-table-column prop="createTime" label="订购时间"> </el-table-column>
+        <el-table-column prop="name" label="名称" sortable> </el-table-column>
+        <el-table-column prop="totalPrice" label="支付金额"> </el-table-column>
+        <el-table-column prop="status" label="订单状态">
           <template slot-scope="scope">
             <el-tag :type="scope.row.status | tagClass">{{
               scope.row.status | statusText
@@ -76,7 +67,7 @@
             <el-button
               type="danger"
               @click="toDelete(scope.row)"
-              :disabled="scope.row.status !== 3 ? false : true"
+              :disabled="scope.row.status === 0 ? true : false"
               >删除</el-button
             >
           </template>
@@ -103,45 +94,95 @@
         :rules="rules"
         label-width="140px"
       >
-        <el-form-item label="系统编号">
+        <el-form-item label="订单编号">
           <el-input
             type="text"
             v-model="formData.id"
             :disabled="true"
           ></el-input>
         </el-form-item>
-        <el-form-item label="名称" prop="name">
-          <el-input type="text" v-model="formData.name"></el-input>
-        </el-form-item>
-        <el-form-item label="审核者" prop="examine">
-          <el-select v-model="formData.examine" placeholde="请选择管理员">
+        <el-form-item
+          v-for="(product, index) in formData.orderProducts"
+          :label="'商品' + index"
+          :key="product.id"
+          :prop="'orderProducts.' + index + '.id'"
+          :rules="{
+            required: true,
+            message: '商品信息不能为空',
+            trigger: 'blur'
+          }"
+        >
+          <el-select
+            v-model="product.id"
+            clearable
+            placeholder="请选择"
+            :disabled="editType == 'update'"
+            @change="changeProduct(product)"
+          >
             <el-option
-              v-for="item in users"
+              v-for="item in products"
+              :key="item.id"
               :label="item.name"
               :value="item.id"
-              :key="item.id"
-            ></el-option>
+            >
+            </el-option>
           </el-select>
+          <el-input-number
+            v-model="product.count"
+            :disabled="editType == 'update'"
+            :min="1"
+            :max="getProductCount(product)"
+            label="数量"
+          ></el-input-number>
+          <el-button
+            :disabled="editType == 'update'"
+            style="margin-left:10px;"
+            type="primary"
+            icon="el-icon-circle-plus"
+            circle
+            @click="addFormDataProduct()"
+          ></el-button>
+          <el-button
+            :disabled="editType == 'update'"
+            type="danger"
+            icon="el-icon-remove"
+            circle
+            v-if="formData.orderProducts.length > 1"
+            @click.prevent="removeFormDataProduct(product)"
+          ></el-button>
         </el-form-item>
-        <el-form-item label="价格" prop="price">
-          <el-input type="text" v-model="formData.price"></el-input>
+        <el-form-item label="收件人" prop="receiveUser">
+          <el-input
+            type="text"
+            :disabled="editType == 'update'"
+            v-model="formData.receiveUser"
+          ></el-input>
         </el-form-item>
-        <el-form-item label="数量" prop="count">
-          <el-input type="text" v-model="formData.count"></el-input>
+        <el-form-item label="联系方式" prop="tel">
+          <el-input
+            type="text"
+            :disabled="editType == 'update'"
+            v-model="formData.tel"
+          ></el-input>
         </el-form-item>
-        <el-form-item label="型号" prop="model">
-          <el-input type="text" v-model="formData.model"></el-input>
+        <el-form-item label="收件地址" prop="address">
+          <el-input
+            type="text"
+            :disabled="editType == 'update'"
+            v-model="formData.address"
+          ></el-input>
         </el-form-item>
-        <el-form-item label="厂商" prop="manufacturer">
-          <el-input type="text" v-model="formData.manufacturer"></el-input>
-        </el-form-item>
-        <el-form-item label="描述" prop="introduce">
-          <el-input type="text" v-model="formData.introduce"></el-input>
+        <el-form-item label="备注" prop="remark">
+          <el-input
+            type="text"
+            :disabled="editType == 'update'"
+            v-model="formData.remark"
+          ></el-input>
         </el-form-item>
         <el-form-item
-          label="产品状态"
+          label="订单状态"
           prop="status"
-          v-show="editType == 'update' && formData.type == 1"
+          v-show="editType == 'update'"
         >
           <el-select v-model="formData.status" placeholde="请选择状态">
             <el-option
@@ -167,42 +208,60 @@
       @closed="closeDetail()"
     >
       <el-descriptions :title="formData.name">
-        <el-descriptions-item label="产品编号">
+        <el-descriptions-item label="订单编号">
           {{ formData.id }}
         </el-descriptions-item>
-        <el-descriptions-item label="价格">
-          {{ formData.price }}
+        <el-descriptions-item label="支付金额">
+          {{ formData.totalPrice }}
         </el-descriptions-item>
-        <el-descriptions-item label="库存">
-          {{ formData.count }}
+        <el-descriptions-item label="收件人">
+          {{ formData.receiveUser }}
         </el-descriptions-item>
-        <el-descriptions-item label="型号">
-          {{ formData.model }}
-        </el-descriptions-item>
-        <el-descriptions-item label="厂商">
-          {{ formData.manufacturer }}
+        <el-descriptions-item label="联系方式">
+          {{ formData.tel }}
         </el-descriptions-item>
         <el-descriptions-item label="描述">
-          {{ formData.introduce }}
+          {{ formData.remark }}
+        </el-descriptions-item>
+        <el-descriptions-item label="收获地址">
+          {{ formData.address }}
         </el-descriptions-item>
         <el-descriptions-item label="状态">
           {{ formData.status | statusText }}
         </el-descriptions-item>
-        <el-descriptions-item label="审核状态">
-          {{ formData.type | typeText }}
+      </el-descriptions>
+      <el-descriptions title="商品详情" :column="4" border></el-descriptions>
+      <el-descriptions
+        :column="4"
+        border
+        v-for="(item, index) in formData.orderProducts"
+        contentStyle="width:200px;"
+        labelStyle="width:100px;"
+        :key="index"
+      >
+        <el-descriptions-item label="编号" >
+          {{ item.id }}
         </el-descriptions-item>
+        <el-descriptions-item
+          label="名称"
+          label-class-name="my-label"
+          content-class-name="my-content"
+          >{{ item.name }}</el-descriptions-item
+        >
+        <el-descriptions-item label="价格">{{
+          item.price
+        }}</el-descriptions-item>
+        <el-descriptions-item label="订购数量">{{
+          item.count
+        }}</el-descriptions-item>
       </el-descriptions>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import {
-  pageProduct,
-  updateProduct,
-  addProduct,
-  delProduct
-} from '@/api/product'
+import { getTableData } from '@/api/product'
+import { save, update, page, del } from '@/api/order'
 import { getUserByRole, getMsgList } from '@/api/user'
 export default {
   data() {
@@ -220,69 +279,60 @@ export default {
       formData: {},
       editType: '',
       options: [
-        { label: '上架', value: 0 },
-        { label: '下架', value: 1 }
+        { label: '未完成', value: 0 },
+        { label: '已完成', value: 1 },
+        { label: '已取消', value: 2 }
       ],
       users: [],
       msgList: [],
+      products: [],
       rowIndex: 0,
       rules: {
-        name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
-        examine: [{ required: true, message: '请选择审核者', trigger: 'blur' }],
-        price: [{ required: true, message: '请输入价格', trigger: 'blur' }],
-        count: [{ required: true, message: '请输入数量', trigger: 'blur' }],
-        model: [{ required: true, message: '请输入型号', trigger: 'blur' }],
-        manufacturer: [
-          { required: true, message: '请输入厂商信息', trigger: 'blur' }
-        ],
-        introduce: [{ required: true, message: '请输入描述', trigger: 'blur' }],
-        status: [{ required: true, message: '请选择状态', trigger: 'change' }]
+        name: [{ required: true, message: '请输入名称', trigger: 'blur' }]
       }
     }
   },
   created() {
     this.getMsgLs()
     this.getUsers()
+    this.getProducts()
   },
   filters: {
     statusText(val) {
       if (val === undefined) return
       if (val === 0) {
-        return '已上架'
+        return '未完成'
       } else if (val === 1) {
-        return '已下架'
+        return '已完成'
+      } else if (val === 2) {
+        return '已取消'
       }
     },
     tagClass(val) {
       if (val === undefined) return
       if (val === 0) {
-        return 'success'
-      } else if (val === 1) {
-        return 'danger'
-      }
-    },
-    typeText(val) {
-      if (val === undefined) return
-      if (val === 0) {
-        return '审核中'
-      } else if (val === 1) {
-        return '通过'
-      } else if (val === 2) {
-        return '未通过'
-      }
-    },
-    typeClass(val) {
-      if (val === undefined) return
-      if (val === 0) {
         return 'warning'
       } else if (val === 1) {
         return 'success'
-      } else if (val === 2) {
+      } else if (val === 1) {
         return 'danger'
       }
     }
   },
   methods: {
+    getProducts() {
+      let param = {
+        status: 0,
+        type: 1
+      }
+      getTableData(param)
+        .then(res => {
+          this.products = res.data.tableList
+        })
+        .catch(err => {
+          this.$message.error(err.message)
+        })
+    },
     getUsers() {
       // 获取角色为管理员的用户
       let param = { id: '1479296185101172737' }
@@ -321,7 +371,7 @@ export default {
         id: this.sch_id,
         status: this.sch_status
       }
-      pageProduct(param)
+      page(param)
         .then(res => {
           this.tableData = res.data.records
           this.allList = res.data.records
@@ -334,12 +384,23 @@ export default {
     // add
     addTab() {
       // 初始化审核中
-      this.formData = { type: 0, status: 1 }
+      this.formData = {
+        orderProducts: [{ name: '', id: '', count: 0, price: 0 }]
+      }
       this.diaIsShow = true
       this.editType = 'add'
       this.$nextTick(() => {
         this.$refs.diaForm.clearValidate()
       })
+    },
+    changeProduct(product) {
+      for (let i = 0; i < this.products.length; i++) {
+        if (product.id == this.products[i].id) {
+          product.name = this.products[i].name
+          product.price = this.products[i].price
+          break
+        }
+      }
     },
     // 删除
     toDelete(row) {
@@ -350,7 +411,7 @@ export default {
       })
         .then(() => {
           const param = { id: row.id }
-          delProduct(param)
+          del(param)
             .then(res => {
               if (res.code == 200) {
                 this.$notify({
@@ -401,12 +462,12 @@ export default {
               {},
               this.formData
             )
-            updateProduct(this.tableData[start + this.rowIndex])
+            update(this.tableData[start + this.rowIndex])
               .then(res => {
                 if (res.code == 200) {
                   this.$notify({
                     title: '成功',
-                    message: '产品修改成功',
+                    message: '订单修改成功',
                     type: 'success'
                   })
                   this.getPageData()
@@ -415,13 +476,25 @@ export default {
               .catch(err => {
                 this.$message.error(err)
               })
+            this.diaIsShow = false
           } else {
-            addProduct(Object.assign({}, this.formData))
+            let totalPrice = 0
+            let name = '订单:'
+            for (let i = 0; i < this.formData.orderProducts.length; i++) {
+              totalPrice +=
+                this.formData.orderProducts[i].price *
+                this.formData.orderProducts[i].count
+              name += this.formData.orderProducts[i].name + ';'
+            }
+            this.formData.totalPrice = totalPrice
+            this.formData.name = name
+            console.log('新增:', this.formData)
+            save(Object.assign({}, this.formData))
               .then(res => {
                 if (res.code == 200) {
                   this.$notify({
                     title: '成功',
-                    message: '产品添加成功',
+                    message: '订单创建成功',
                     type: 'success'
                   })
                   this.getPageData()
@@ -430,46 +503,32 @@ export default {
               .catch(error => {
                 this.$message.error(error)
               })
+            this.diaIsShow = false
           }
-          this.diaIsShow = false
         } else {
           return
         }
       })
     },
-    examined(type) {
-      let item = Object.assign({}, this.formData)
-      item.type = type
-      // console.log('item', item, type)
-      this.$confirm('是否确定此操作?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
+    addFormDataProduct() {
+      this.formData.orderProducts.push({
+        name: '',
+        id: '',
+        count: 0
       })
-        .then(() => {
-          updateProduct(item)
-            .then(res => {
-              if (res.code == 200) {
-                this.$notify({
-                  title: '成功',
-                  message: '操作成功',
-                  type: 'success'
-                })
-                this.getMsgLs()
-              }
-            })
-            .catch(err => {
-              this.$message.error(err)
-            })
-        })
-        .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消此操作'
-          })
-        })
-      this.detailIsShow = false
-      this.formData = {}
+    },
+    removeFormDataProduct(item) {
+      var index = this.formData.orderProducts.indexOf(item)
+      if (index !== -1) {
+        this.formData.orderProducts.splice(index, 1)
+      }
+    },
+    getProductCount(item) {
+      for (let i = 0; i < this.products.length; i++) {
+        if (item.id == this.products[i].id) {
+          return +this.products[i].count
+        }
+      }
     }
   }
 }
@@ -516,5 +575,12 @@ export default {
 }
 .searchDiv [class^='el-icon'] {
   color: #fff;
+}
+.my-label {
+  background: #e1f3d8;
+}
+
+.my-content {
+  background: #fde2e2;
 }
 </style>

@@ -16,3 +16,7 @@ export function pageProduct(data) {
   const url = '/product/page'
   return $axios.post(url, data)
 }
+export function getTableData(data) {
+  const url = '/home/getTableList'
+  return $axios.get(url, data)
+}
