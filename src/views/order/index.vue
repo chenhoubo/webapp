@@ -239,7 +239,7 @@
         labelStyle="width:100px;"
         :key="index"
       >
-        <el-descriptions-item label="编号" >
+        <el-descriptions-item label="编号">
           {{ item.id }}
         </el-descriptions-item>
         <el-descriptions-item
