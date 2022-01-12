@@ -24,14 +24,20 @@
       <el-tab-pane label="评论">
         <div class="container">
           <div class="commentbox">
-            <textarea
-              cols="80"
-              rows="50"
-              placeholder="来说几句吧......"
-              class="mytextarea"
-              id="content"
-            ></textarea>
-            <div class="btn btn-info pull-right" id="comment">评论</div>
+            <el-input
+              type="textarea"
+              :rows="4"
+              placeholder="请输入内容"
+              v-model="formData.content"
+            >
+            </el-input>
+            <el-button
+              type="primary"
+              round
+              @click="send()"
+              style="position: absolute;bottom: 10px;"
+              >评论</el-button
+            >
           </div>
           <div class="comment-list">
             <div class="comment-info" v-for="(item, index) in arr" :key="index">
@@ -74,6 +80,7 @@ export default {
   },
   data() {
     return {
+      formData: {},
       arr: [
         {
           id: 1,
@@ -189,15 +196,7 @@ export default {
 .commentbox {
   width: 900px;
   margin: 20px auto;
-}
-.mytextarea {
-  width: 100%;
-  overflow: auto;
-  word-break: break-all;
-  height: 100px;
-  color: #000;
-  font-size: 1em;
-  resize: none;
+  position: relative;
 }
 .comment-list {
   width: 900px;
