@@ -70,7 +70,10 @@
               @click="editTable(scope.$index, scope.row)"
               >编辑</el-button
             >
-            <el-button type="success" @click="toResetPas(scope.row)"
+            <el-button
+              type="success"
+              @click="toResetPas(scope.row)"
+              :disabled="scope.row.username === 'admin' ? true : false"
               >重置用户密码</el-button
             >
             <el-button type="warning" @click="toDetail(scope.row)"
@@ -160,7 +163,7 @@
           <el-input type="text" v-model="formData.address"></el-input>
         </el-form-item>
         <el-form-item label="登录账号" prop="username">
-          <el-input type="text" v-model="formData.username"></el-input>
+          <el-input type="text" v-model="formData.username" disabled></el-input>
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-select v-model="formData.status" placeholde="请选择状态">
@@ -259,7 +262,11 @@ export default {
       }
     }
   },
-  created() {
+  // created() {
+  //   this.getPageData()
+  //   this.getRoles()
+  // },
+  activated() {
     this.getPageData()
     this.getRoles()
   },

@@ -3,7 +3,7 @@
     <div class="personal_h">
       <div class="perh_d1">
         <div class="perh_info">
-          <p class="perh_p0">{{ username }}</p>
+          <p class="perh_p0">{{ name }}</p>
           <div class="chatBox">
             <a href="javascript:;"><i class="iconfont el-icon-weixin"></i></a>
             <a href="javascript:;"><i class="iconfont el-icon-twitter"></i></a>
@@ -13,7 +13,7 @@
         </div>
         <img src="../../assets/personal/user01.jpg" />
         <div class="rightIcon">
-          <span style="margin-right: 20px;"
+          <span style="margin-right: 20px"
             ><i class="el-icon-star-on"></i>Collection</span
           >
           <span><i class="el-icon-chat-dot-round"></i>Message</span>
@@ -21,36 +21,44 @@
       </div>
     </div>
     <el-tabs>
-      <el-tab-pane label="Timeline">
-        <!-- <el-button type="primary" slot="label">Timeline</el-button> -->
-        <el-timeline>
-          <el-timeline-item timestamp="2019/4/12" placement="top">
-            <el-card>
-              <h4>更新 Github 模板</h4>
-              <p>提交于 2019/4/12 20:46</p>
-            </el-card>
-          </el-timeline-item>
-          <el-timeline-item timestamp="2019/4/3" placement="top">
-            <el-card>
-              <h4>更新 Github 模板</h4>
-              <p>提交于 2018/4/3 20:46</p>
-            </el-card>
-          </el-timeline-item>
-          <el-timeline-item timestamp="2019/4/2" placement="top">
-            <el-card>
-              <h4>更新 Github 模板</h4>
-              <p>提交于 2019/4/2 20:46</p>
-            </el-card>
-          </el-timeline-item>
-          <el-timeline-item timestamp="2019/4/1" placement="top">
-            <el-card>
-              <h4>更新 Github 模板</h4>
-              <p>提交于 2019/4/1 20:46</p>
-            </el-card>
-          </el-timeline-item>
-        </el-timeline>
+      <el-tab-pane label="评论">
+        <div class="container">
+          <div class="commentbox">
+            <textarea
+              cols="80"
+              rows="50"
+              placeholder="来说几句吧......"
+              class="mytextarea"
+              id="content"
+            ></textarea>
+            <div class="btn btn-info pull-right" id="comment">评论</div>
+          </div>
+          <div class="comment-list">
+            <div class="comment-info" v-for="(item, index) in arr" :key="index">
+              <header><img src="../../assets/personal/user01.jpg" /></header>
+              <div class="comment-right">
+                <h3>{{ item.replyName }}</h3>
+                <div class="comment-content-header">
+                  <span
+                    ><i class="glyphicon glyphicon-time"></i
+                    >{{ item.time }}</span
+                  >
+                </div>
+                <p class="content">{{ item.content }}</p>
+                <div class="comment-content-footer">
+                  <div class="row">
+                    <div class="col-md-2">
+                      <span class="reply-btn">回复</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="reply-list"></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </el-tab-pane>
-      <el-tab-pane label="Message">
+      <el-tab-pane label="信息">
         <!-- <el-button type="success" slot="label">Message</el-button> -->
         Message
       </el-tab-pane>
@@ -62,7 +70,31 @@
 import { mapGetters } from 'vuex'
 export default {
   computed: {
-    ...mapGetters(['username', 'introduce'])
+    ...mapGetters(['name', 'introduce'])
+  },
+  data() {
+    return {
+      arr: [
+        {
+          id: 1,
+          img: '../../assets/personal/user01.jpg',
+          replyName: '帅大叔',
+          beReplyName: '匿名',
+          content: '整体来说，一般般，知识一些小细节的地方写的不错。',
+          time: '2017-10-17 11:42:53',
+          replyBody: [
+            {
+              id: 3,
+              img: '',
+              replyName: '帅大叔',
+              beReplyName: '匿名',
+              content: '谢谢夸奖，我回再接再厉的',
+              time: '2017-10-17 11:42:53'
+            }
+          ]
+        }
+      ]
+    }
   }
 }
 </script>
@@ -149,5 +181,81 @@ export default {
   .el-tabs__content {
     padding: 0 20px;
   }
+}
+
+.container {
+  width: 1000px;
+}
+.commentbox {
+  width: 900px;
+  margin: 20px auto;
+}
+.mytextarea {
+  width: 100%;
+  overflow: auto;
+  word-break: break-all;
+  height: 100px;
+  color: #000;
+  font-size: 1em;
+  resize: none;
+}
+.comment-list {
+  width: 900px;
+  margin: 20px auto;
+  clear: both;
+  padding-top: 20px;
+}
+.comment-list .comment-info {
+  position: relative;
+  margin-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #ccc;
+}
+.comment-list .comment-info header {
+  width: 10%;
+  position: absolute;
+}
+.comment-list .comment-info header img {
+  width: 100%;
+  border-radius: 50%;
+  padding: 5px;
+}
+.comment-list .comment-info .comment-right {
+  padding: 5px 0px 5px 11%;
+}
+.comment-list .comment-info .comment-right h3 {
+  margin: 5px 0px;
+}
+.comment-list .comment-info .comment-right .comment-content-header {
+  height: 25px;
+}
+.comment-list .comment-info .comment-right .comment-content-header span,
+.comment-list .comment-info .comment-right .comment-content-footer span {
+  padding-right: 2em;
+  color: #aaa;
+}
+.comment-list .comment-info .comment-right .comment-content-header span,
+.comment-list
+  .comment-info
+  .comment-right
+  .comment-content-footer
+  span.reply-btn,
+.send,
+.reply-list-btn {
+  cursor: pointer;
+}
+.comment-list .comment-info .comment-right .reply-list {
+  border-left: 3px solid #ccc;
+  padding-left: 7px;
+}
+.comment-list .comment-info .comment-right .reply-list .reply {
+  border-bottom: 1px dashed #ccc;
+}
+.comment-list .comment-info .comment-right .reply-list .reply div span {
+  padding-left: 10px;
+}
+.comment-list .comment-info .comment-right .reply-list .reply p span {
+  padding-right: 2em;
+  color: #aaa;
 }
 </style>

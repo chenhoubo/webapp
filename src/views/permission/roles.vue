@@ -119,7 +119,11 @@ export default {
       }
     }
   },
-  created() {
+  // created() {
+  //   this._getAllRolse()
+  //   this.treeData = this.getTreeData(this.allRoute)
+  // },
+  activated() {
     this._getAllRolse()
     this.treeData = this.getTreeData(this.allRoute)
   },

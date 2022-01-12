@@ -58,6 +58,7 @@
               :startVal="startVal"
               :endVal="profit"
               :duration="2000"
+              :decimals="2"
             ></count-to>
             <p class="cardItem_p1">总利润</p>
           </div>
@@ -112,7 +113,10 @@ export default {
       barData: {}
     }
   },
-  created() {
+  // created() {
+  //   this._getAllData()
+  // },
+  activated() {
     this._getAllData()
   },
   components: {

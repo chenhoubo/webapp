@@ -44,7 +44,7 @@
           sortable
           width="240"
         ></el-table-column>
-        <el-table-column prop="createTime" label="订购时间"> </el-table-column>
+        <el-table-column prop="createDate" label="订购时间"> </el-table-column>
         <el-table-column prop="name" label="名称" sortable> </el-table-column>
         <el-table-column prop="totalPrice" label="支付金额"> </el-table-column>
         <el-table-column prop="status" label="订单状态">
@@ -211,8 +211,20 @@
         <el-descriptions-item label="订单编号">
           {{ formData.id }}
         </el-descriptions-item>
+        <el-descriptions-item label="订购时间">
+          {{ formData.createDate }}
+        </el-descriptions-item>
+        <el-descriptions-item label="更新时间">
+          {{ formData.updateDate }}
+        </el-descriptions-item>
         <el-descriptions-item label="支付金额">
           {{ formData.totalPrice }}
+        </el-descriptions-item>
+        <el-descriptions-item label="收益">
+          {{ formData.profit }}
+        </el-descriptions-item>
+        <el-descriptions-item label="状态">
+          {{ formData.status | statusText }}
         </el-descriptions-item>
         <el-descriptions-item label="收件人">
           {{ formData.receiveUser }}
@@ -220,14 +232,11 @@
         <el-descriptions-item label="联系方式">
           {{ formData.tel }}
         </el-descriptions-item>
-        <el-descriptions-item label="描述">
-          {{ formData.remark }}
-        </el-descriptions-item>
         <el-descriptions-item label="收获地址">
           {{ formData.address }}
         </el-descriptions-item>
-        <el-descriptions-item label="状态">
-          {{ formData.status | statusText }}
+        <el-descriptions-item label="描述">
+          {{ formData.remark }}
         </el-descriptions-item>
       </el-descriptions>
       <el-descriptions title="商品详情" :column="4" border></el-descriptions>
@@ -263,6 +272,7 @@
 import { getTableData } from '@/api/product'
 import { save, update, page, del } from '@/api/order'
 import { getUserByRole, getMsgList } from '@/api/user'
+import { format } from '@/utils/component'
 export default {
   data() {
     return {
@@ -292,7 +302,12 @@ export default {
       }
     }
   },
-  created() {
+  // created() {
+  //   this.getMsgLs()
+  //   this.getUsers()
+  //   this.getProducts()
+  // },
+  activated() {
     this.getMsgLs()
     this.getUsers()
     this.getProducts()
@@ -373,8 +388,16 @@ export default {
       }
       page(param)
         .then(res => {
-          this.tableData = res.data.records
-          this.allList = res.data.records
+          let list = res.data.records.map(item => {
+            return {
+              ...item,
+              createDate: format(item.createTime),
+              updateDate: format(item.updateTime)
+            }
+          })
+          // console.log('res:', list)
+          this.tableData = list
+          this.allList = list
           this.total = res.data.total
         })
         .catch(error => {
@@ -455,6 +478,8 @@ export default {
     changeTab(form, type) {
       this.$refs[form].validate(valid => {
         if (valid) {
+          delete this.formData.createDate
+          delete this.formData.updateDate
           if (type === 'update') {
             // 改变整个表格数据
             let start = (this.currentPage - 1) * this.pageSize

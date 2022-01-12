@@ -23,3 +23,30 @@ export function translateDataToTree(data) {
   translator(parents, children)
   return parents
 }
+
+function add0(m) {
+  return m < 10 ? '0' + m : m
+}
+export function format(shijianchuo) {
+  //shijianchuo是整数，否则要parseInt转换
+  let time = new Date(shijianchuo)
+  let y = time.getFullYear()
+  let m = time.getMonth() + 1
+  let d = time.getDate()
+  let h = time.getHours()
+  let mm = time.getMinutes()
+  let s = time.getSeconds()
+  return (
+    y +
+    '-' +
+    add0(m) +
+    '-' +
+    add0(d) +
+    ' ' +
+    add0(h) +
+    ':' +
+    add0(mm) +
+    ':' +
+    add0(s)
+  )
+}

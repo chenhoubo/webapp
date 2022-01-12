@@ -46,7 +46,7 @@
         ></el-table-column>
         <el-table-column prop="name" label="名称" sortable width="180">
         </el-table-column>
-        <el-table-column prop="price" label="价格"> </el-table-column>
+        <el-table-column prop="price" label="售价"> </el-table-column>
         <el-table-column prop="count" label="剩余数量"> </el-table-column>
         <el-table-column prop="manufacturer" label="厂家"> </el-table-column>
         <el-table-column prop="type" label="审核结果" width="90">
@@ -129,7 +129,10 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="价格" prop="price">
+        <el-form-item label="成本" prop="cost">
+          <el-input type="number" v-model="formData.cost"></el-input>
+        </el-form-item>
+        <el-form-item label="售价" prop="price">
           <el-input type="number" v-model="formData.price"></el-input>
         </el-form-item>
         <el-form-item label="数量" prop="count">
@@ -176,7 +179,10 @@
         <el-descriptions-item label="产品编号">
           {{ formData.id }}
         </el-descriptions-item>
-        <el-descriptions-item label="价格">
+        <el-descriptions-item label="成本">
+          {{ formData.cost }}
+        </el-descriptions-item>
+        <el-descriptions-item label="售价">
           {{ formData.price }}
         </el-descriptions-item>
         <el-descriptions-item label="库存">
@@ -241,6 +247,7 @@ export default {
       rules: {
         name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
         examine: [{ required: true, message: '请选择审核者', trigger: 'blur' }],
+        cost: [{ required: true, message: '请输入进价', trigger: 'blur' }],
         price: [{ required: true, message: '请输入价格', trigger: 'blur' }],
         count: [{ required: true, message: '请输入数量', trigger: 'blur' }],
         model: [{ required: true, message: '请输入型号', trigger: 'blur' }],
@@ -252,7 +259,11 @@ export default {
       }
     }
   },
-  created() {
+  // created() {
+  //   this.getMsgLs()
+  //   this.getUsers()
+  // },
+  activated() {
     this.getMsgLs()
     this.getUsers()
   },
@@ -424,6 +435,9 @@ export default {
         if (valid) {
           this.formData.price = +this.formData.price
           this.formData.count = +this.formData.count
+          this.formData.cost = +this.formData.cost
+          //计算单件利润
+          this.formData.profit = this.formData.price - this.formData.cost
           if (type === 'update') {
             // 改变整个表格数据
             let start = (this.currentPage - 1) * this.pageSize
@@ -481,6 +495,7 @@ export default {
         .then(() => {
           item.price = +item.price
           item.count = +item.count
+          item.cost = +item.cost
           updateProduct(item)
             .then(res => {
               if (res.code == 200) {

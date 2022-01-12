@@ -215,7 +215,10 @@ export default {
       }
     }
   },
-  created() {
+  // created() {
+  //   this._getPageTab2()
+  // },
+  activated() {
     this._getPageTab2()
   },
   filters: {
