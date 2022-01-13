@@ -1,5 +1,5 @@
 import axios from 'axios'
-import Qs from 'qs'
+// import Qs from 'qs'
 import store from '@/store'
 import router from '@/router'
 import Vue from 'vue'
@@ -35,11 +35,23 @@ $axios.interceptors.response.use(
     if (loading) {
       loading.close()
     }
-    const code = response.status
-    if ((code >= 200 && code < 300) || code === 304) {
+    const code = response.data.code
+    const msg = response.data.msg
+    // console.log('code:', code)
+    if (code == 401) {
+      Message.error('登录失效，请重新登录。')
+      store.commit('DEL_TOKEN')
+      router.replace({
+        path: '/login',
+        query: {
+          redirect: router.currentRoute.fullPath
+        }
+      })
+    } else if (code != 200) {
+      Message.error(msg)
       return Promise.resolve(response.data)
     } else {
-      return Promise.reject(response)
+      return Promise.resolve(response.data)
     }
   },
   error => {

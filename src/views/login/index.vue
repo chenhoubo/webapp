@@ -63,7 +63,7 @@ export default {
       text: '向右滑动',
       showSlide: false,
       ruleForm: {
-        username: 'admin',
+        username: 'user',
         password: '123456'
       },
       rules: {
@@ -101,9 +101,8 @@ export default {
     _login() {
       this.$store
         .dispatch('user/_login', this.ruleForm)
-        .then(res => {
-          console.log('登录的返回:', res)
-          this.$router.push(this.$route.query.redirect)
+        .then(() => {
+          this.$router.push(this.$route.query.redirect).catch(() => {})
           if (this.notifyObj) {
             this.notifyObj.close()
           }
@@ -117,7 +116,7 @@ export default {
     shopTip() {
       this.notifyObj = this.$notify({
         title: '提示',
-        message: '目前有两个登陆角色，管理员和普通用户',
+        message: '访客登录(账号/密码):user/123456',
         duration: 0,
         iconClass: 'el-icon-s-opportunity'
       })

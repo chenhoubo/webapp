@@ -11,7 +11,7 @@
               :endVal="vistors"
               :duration="2000"
             ></count-to>
-            <p class="cardItem_p1">Total Visitors</p>
+            <p class="cardItem_p1">访问总数</p>
           </div>
           <div class="cardItem_icon">
             <i class="el-icon-user color-green1"></i>
@@ -27,7 +27,7 @@
               :endVal="message"
               :duration="2000"
             ></count-to>
-            <p class="cardItem_p1">Messages</p>
+            <p class="cardItem_p1">留言</p>
           </div>
           <div class="cardItem_icon">
             <i class="el-icon-s-comment color-blue"></i>
@@ -43,7 +43,7 @@
               :endVal="order"
               :duration="2000"
             ></count-to>
-            <p class="cardItem_p1">Total Order Placeed</p>
+            <p class="cardItem_p1">订单总数</p>
           </div>
           <div class="cardItem_icon">
             <i class="el-icon-shopping-cart-2 color-red"></i>
@@ -58,8 +58,9 @@
               :startVal="startVal"
               :endVal="profit"
               :duration="2000"
+              :decimals="2"
             ></count-to>
-            <p class="cardItem_p1">Total Profit</p>
+            <p class="cardItem_p1">总利润</p>
           </div>
           <div class="cardItem_icon">
             <i class="el-icon-wallet color-green2"></i>
@@ -112,7 +113,10 @@ export default {
       barData: {}
     }
   },
-  created() {
+  // created() {
+  //   this._getAllData()
+  // },
+  activated() {
     this._getAllData()
   },
   components: {

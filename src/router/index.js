@@ -81,6 +81,66 @@ export const currencyRoutes = [
 /*动态添加routers*/
 export const asyncRoutes = [
   {
+    path: '/order',
+    name: 'Order',
+    component: Layout,
+    redirect: '/order/index',
+    meta: {
+      title: '订单管理',
+      icon: 'el-icon-s-cooperation'
+    },
+    children: [
+      {
+        path: 'index',
+        name: 'Order-index',
+        component: () => import('@/views/order/index'),
+        meta: { title: '订单列表', icon: 'el-icon-s-order' }
+      }
+    ]
+  },
+  {
+    path: '/product',
+    name: 'Product',
+    component: Layout,
+    redirect: '/product/index',
+    meta: {
+      title: '产品管理',
+      icon: 'el-icon-s-cooperation'
+    },
+    children: [
+      {
+        path: 'index',
+        name: 'Product-index',
+        component: () => import('@/views/product/index'),
+        meta: { title: '产品列表', icon: 'el-icon-s-order' }
+      }
+    ]
+  },
+  {
+    path: '/system',
+    name: 'System',
+    component: Layout,
+    redirect: '/system/menu',
+    meta: {
+      title: '系统设置',
+      icon: 'el-icon-setting'
+    },
+    children: [
+      {
+        path: 'menu',
+        name: 'System-menu',
+        component: () => import('@/views/system/menu-Setting'),
+        meta: { title: '菜单管理', icon: 'el-icon-menu' }
+      },
+      {
+        path: 'user',
+        name: 'System-user',
+        component: () => import('@/views/system/user-Setting'),
+        meta: { title: '用户管理', icon: 'el-icon-user' }
+      }
+    ]
+  },
+  {
     path: '/permission',
     name: 'Permission',
     component: Layout,
@@ -94,14 +154,14 @@ export const asyncRoutes = [
         path: 'page-user',
         name: 'PageUser',
         component: () => import('@/views/permission/page-user'),
-        meta: { title: '用户页面', icon: 'el-icon-user' }
+        meta: { title: '用户权限', icon: 'el-icon-user' }
       },
       {
         path: 'page-admin',
         name: 'PageAdmin',
         component: () => import('@/views/permission/page-admin'),
         meta: {
-          title: '管理员页面',
+          title: '管理员权限',
           icon: 'el-icon-user-solid'
         }
       },
@@ -142,12 +202,13 @@ export const asyncRoutes = [
     component: Layout,
     name: 'Icons',
     redirect: '/icons/index',
+    meta: { title: 'Icons', icon: 'el-icon-picture-outline' },
     children: [
       {
         path: 'index',
         name: 'Icons-index',
         component: () => import('@/views/icons'),
-        meta: { title: 'Icons图标', icon: 'el-icon-picture-outline' }
+        meta: { title: 'Icons图标' }
       }
     ]
   },
@@ -247,11 +308,28 @@ export const asyncRoutes = [
     ]
   },
   {
-    path: 'https://github.com/gcddblue/vue-admin-webapp',
+    path: 'https://github.com/chenhoubo/webapp',
     name: 'Github',
     meta: { icon: 'el-icon-link', title: '项目链接' }
   },
   NavTest,
+  {
+    path: '/other',
+    component: Layout,
+    name: 'Other',
+    redirect: '/other/index',
+    meta: {
+      title: '其他'
+    },
+    children: [
+      {
+        path: 'index',
+        name: 'Other-Index',
+        component: () => import('@/views/other/index'),
+        meta: { title: '其他', icon: 'el-icon-s-release' }
+      }
+    ]
+  },
   {
     path: '*',
     name: '*404',

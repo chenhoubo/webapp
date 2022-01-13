@@ -6,6 +6,7 @@ const state = {
     ? sessionStorage.getItem('open')
     : 'false',
   msgIsShow: false,
+  isMsg: false,
   showDriver: localStorage.getItem('driver')
     ? localStorage.getItem('driver')
     : 'yes'
@@ -17,6 +18,9 @@ const mutations = {
   },
   SET_MSGISOPEN(state) {
     state.msgIsShow = !state.msgIsShow
+  },
+  SET_ISMSG(state, payload) {
+    state.isMsg = payload
   },
   SET_DRIVER(state, payload) {
     state.showDriver = payload

@@ -9,7 +9,7 @@
         border
         style="width: 100%;"
       >
-        <el-table-column prop="key" label="身份"></el-table-column>
+        <el-table-column prop="name" label="身份"></el-table-column>
         <el-table-column prop="description" label="说明"></el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
@@ -35,11 +35,18 @@
         :rules="rules"
         label-width="140px"
       >
-        <el-form-item label="身份" prop="key">
+        <el-form-item label="身份" prop="name">
           <el-input
             type="text"
             placeholder="请输入要添加的身份类别"
-            v-model="formData.key"
+            v-model="formData.name"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="枚举" prop="value">
+          <el-input
+            type="text"
+            placeholder="请输入要添加的身份枚举值"
+            v-model="formData.value"
           ></el-input>
         </el-form-item>
         <el-form-item label="说明" prop="description">
@@ -71,7 +78,7 @@
 </template>
 
 <script>
-import { getAllRolse } from '@/api/roles'
+import { getAllRolse, updateRole, addRole, delRole } from '@/api/roles'
 import { asyncRoutes, currencyRoutes } from '@/router'
 export default {
   data() {
@@ -81,10 +88,17 @@ export default {
       formData: {},
       editType: 'update',
       rules: {
-        key: [
+        name: [
           {
             required: true,
             message: '请输入要添加的身份类别',
+            trigger: 'blur'
+          }
+        ],
+        value: [
+          {
+            required: true,
+            message: '请输入要添加的身份枚举值',
             trigger: 'blur'
           }
         ],
@@ -105,7 +119,11 @@ export default {
       }
     }
   },
-  created() {
+  // created() {
+  //   this._getAllRolse()
+  //   this.treeData = this.getTreeData(this.allRoute)
+  // },
+  activated() {
     this._getAllRolse()
     this.treeData = this.getTreeData(this.allRoute)
   },
@@ -113,14 +131,14 @@ export default {
     _getAllRolse() {
       getAllRolse()
         .then(res => {
-          this.rolesTab = res.data.allRoles
+          this.rolesTab = res.data
         })
         .catch(error => {
           this.$message.error(error)
         })
     },
     isAdmin(row) {
-      if (row.key === 'admin' || row.key === 'user') return true
+      if (row.value === 'admin' || row.value === 'manager') return true
       else return false
     },
     deleteRoles(index) {
@@ -130,11 +148,20 @@ export default {
         type: 'warning'
       })
         .then(() => {
-          this.rolesTab.splice(index, 1)
-          this.$message({
-            type: 'success',
-            message: '删除成功!'
-          })
+          const param = { id: this.rolesTab[index].id }
+          delRole(param)
+            .then(res => {
+              if (res.code == 200) {
+                this.rolesTab.splice(index, 1)
+                this.$message({
+                  type: 'success',
+                  message: '删除成功!'
+                })
+              }
+            })
+            .catch(error => {
+              this.$message.error(error)
+            })
         })
         .catch(() => {
           this.$message({
@@ -157,39 +184,63 @@ export default {
       this.editIndex = index
       this.editType = 'update'
       this.formData = Object.assign({}, this.formData, {
-        key: row.key,
+        name: row.name,
+        value: row.value,
         description: row.description
       })
       this.$nextTick(() => {
         this.$refs.rolesForm.clearValidate()
-        this.$refs.tree.setCheckedKeys(row.pages)
+        this.$refs.tree.setCheckedKeys(row.menus)
       })
     },
     changeRoles(form, type) {
       this.$refs[form].validate(valid => {
         if (valid) {
           let treeKeys = this.$refs.tree.getCheckedKeys()
+          console.log('rolesTab', this.rolesTab)
           if (type === 'update') {
             let index = this.editIndex
-            this.rolesTab[index].key = this.formData.key
+            this.rolesTab[index].name = this.formData.name
+            this.rolesTab[index].value = this.formData.value
             this.rolesTab[index].description = this.formData.description
-            this.rolesTab[index].pages = treeKeys
-            this.$notify({
-              title: '成功',
-              message: '权限修改成功',
-              type: 'success'
-            })
+            this.rolesTab[index].menus = treeKeys
+            updateRole(this.rolesTab[index])
+              .then(res => {
+                if (res.code == 200) {
+                  this.$notify({
+                    title: '成功',
+                    message: '权限修改成功',
+                    type: 'success'
+                  })
+                  this.formData = {}
+                  this.editIndex = 0
+                }
+              })
+              .catch(error => {
+                this.$message.error(error)
+              })
           } else if (type === 'add') {
             let newTab = {}
-            newTab.key = this.formData.key
+            newTab.name = this.formData.name
+            newTab.value = this.formData.value
             newTab.description = this.formData.description
-            newTab.pages = treeKeys
-            this.rolesTab.push(newTab)
-            this.$notify({
-              title: '成功',
-              message: '权限添加成功',
-              type: 'success'
-            })
+            newTab.menus = treeKeys
+            addRole(newTab)
+              .then(res => {
+                if (res.code == 200) {
+                  this.rolesTab.push(newTab)
+                  this.$notify({
+                    title: '成功',
+                    message: '权限添加成功',
+                    type: 'success'
+                  })
+                  this.formData = {}
+                  this.editIndex = 0
+                }
+              })
+              .catch(error => {
+                this.$message.error(error)
+              })
           }
           this.diaIsShow = false
         } else return
@@ -229,13 +280,13 @@ export default {
       }
       return false
     },
-    forSearchArr(route, roles) {
+    forSearchArr(route, menus) {
       let arrNew = []
       for (let item of route) {
         let itemNew = { ...item } //解决浅拷贝共享同一内存地址
-        if (roles.includes(itemNew.name)) {
+        if (menus.includes(itemNew.name)) {
           if (itemNew.children) {
-            itemNew.children = this.forSearchArr(itemNew.children, roles)
+            itemNew.children = this.forSearchArr(itemNew.children, menus)
           }
           arrNew.push(itemNew)
         }

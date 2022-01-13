@@ -6,6 +6,7 @@ import {
   Form,
   FormItem,
   Input,
+  InputNumber,
   Select,
   Option,
   Message,
@@ -37,6 +38,8 @@ import {
   Tree,
   Upload,
   Carousel,
+  Descriptions,
+  DescriptionsItem,
   CarouselItem
 } from 'element-ui'
 Message.install = () => {
@@ -55,6 +58,7 @@ Vue.use(Col)
 Vue.use(Form)
 Vue.use(FormItem)
 Vue.use(Input)
+Vue.use(InputNumber)
 Vue.use(Message)
 Vue.use(MessageBox)
 Vue.use(Notification)
@@ -87,3 +91,5 @@ Vue.use(Tree)
 Vue.use(Upload)
 Vue.use(Carousel)
 Vue.use(CarouselItem)
+Vue.use(Descriptions)
+Vue.use(DescriptionsItem)
