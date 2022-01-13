@@ -20,87 +20,207 @@
         </div>
       </div>
     </div>
-    <el-tabs>
-      <el-tab-pane label="评论">
-        <div class="container">
-          <div class="commentbox">
-            <el-input
-              type="textarea"
-              :rows="4"
-              placeholder="请输入内容"
-              v-model="formData.content"
-            >
-            </el-input>
-            <el-button
-              type="primary"
-              round
-              @click="send()"
-              style="position: absolute;bottom: 10px;"
-              >评论</el-button
-            >
+    <div style="margin-top:15px;padding-bottom: 15px;position: relative;">
+      <div class="left">
+        <el-card>
+          <div slot="header" class="clearfix">
+            <span style="font-size: 16px; font-weight: bold;">用户信息</span>
           </div>
-          <div class="comment-list">
-            <div class="comment-info" v-for="(item, index) in arr" :key="index">
-              <header><img src="../../assets/personal/user01.jpg" /></header>
-              <div class="comment-right">
-                <h3>{{ item.replyName }}</h3>
-                <div class="comment-content-header">
-                  <span
-                    ><i class="glyphicon glyphicon-time"></i
-                    >{{ item.time }}</span
-                  >
-                </div>
-                <p class="content">{{ item.content }}</p>
-                <div class="comment-content-footer">
-                  <div class="row">
-                    <div class="col-md-2">
-                      <span class="reply-btn">回复</span>
-                    </div>
+          <el-descriptions :column="2">
+            <el-descriptions-item label="用户名">{{
+              info.name
+            }}</el-descriptions-item>
+            <el-descriptions-item label="账号">{{
+              info.username
+            }}</el-descriptions-item>
+            <el-descriptions-item label="性别">
+              <el-tag size="small">{{ info.gender }}</el-tag>
+            </el-descriptions-item>
+            <el-descriptions-item label="年龄">{{
+              info.age
+            }}</el-descriptions-item>
+            <el-descriptions-item label="电话">{{
+              info.tel
+            }}</el-descriptions-item>
+            <el-descriptions-item label="地址">{{
+              info.address
+            }}</el-descriptions-item>
+            <el-descriptions-item label="角色">{{
+              info.rolename
+            }}</el-descriptions-item>
+            <el-descriptions-item label="风格">{{
+              info.style
+            }}</el-descriptions-item>
+            <el-descriptions-item label="描述">{{
+              info.introduce
+            }}</el-descriptions-item>
+            <el-descriptions-item label="创建时间">{{
+              info.createTime
+            }}</el-descriptions-item>
+          </el-descriptions>
+        </el-card>
+        <el-card style="margin-top:15px;">
+          <div slot="header" class="clearfix">
+            <span style="font-size: 16px; font-weight: bold;">系统信息</span>
+          </div>
+          <el-descriptions :column="2">
+            <el-descriptions-item label="版本">{{
+              sysInfo.version
+            }}</el-descriptions-item>
+            <el-descriptions-item label="描述">{{
+              sysInfo.desc
+            }}</el-descriptions-item>
+            <el-descriptions-item label="作者">{{
+              sysInfo.realName
+            }}</el-descriptions-item>
+            <el-descriptions-item label="描述">{{
+              sysInfo.desc
+            }}</el-descriptions-item>
+            <el-descriptions-item label="版本时间">{{
+              sysInfo.createTime
+            }}</el-descriptions-item>
+            <el-descriptions-item label="联系电话">{{
+              sysInfo.tel
+            }}</el-descriptions-item>
+            <el-descriptions-item label="邮箱">{{
+              sysInfo.email
+            }}</el-descriptions-item>
+          </el-descriptions>
+        </el-card>
+      </div>
+      <div class="right">
+        <el-card>
+          <div slot="header" class="clearfix">
+            <span style="font-size: 16px; font-weight: bold;">用户评论</span>
+          </div>
+          <div>
+            <div class="commentbox">
+              <el-input
+                type="textarea"
+                :rows="4"
+                placeholder="请输入内容"
+                v-model="formData.content"
+                style="width:90%;"
+              >
+              </el-input>
+              <el-button
+                type="primary"
+                round
+                @click="send()"
+                style="position: absolute;bottom: 10px;left: 91%;"
+                >评论</el-button
+              >
+            </div>
+            <div class="comment-list">
+              <div
+                class="comment-info"
+                v-for="(item, index) in arr"
+                :key="index"
+              >
+                <header><img src="../../assets/personal/user01.jpg" /></header>
+                <div class="comment-right">
+                  <h3>{{ item.replyName }}</h3>
+                  <div class="comment-content-header">
+                    <span
+                      ><i class="glyphicon glyphicon-time"></i
+                      >{{ item.time }}</span
+                    >
                   </div>
+                  <p class="content">{{ item.content }}</p>
                 </div>
-                <div class="reply-list"></div>
               </div>
             </div>
           </div>
-        </div>
-      </el-tab-pane>
-      <el-tab-pane label="信息">
-        <!-- <el-button type="success" slot="label">Message</el-button> -->
-        Message
-      </el-tab-pane>
-    </el-tabs>
+        </el-card>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
+import { getInfo } from '@/api/login'
+import { save, all } from '@/api/speak'
+import { available } from '@/api/info'
+import { format } from '@/utils/component'
 export default {
   computed: {
     ...mapGetters(['name', 'introduce'])
   },
+  activated() {
+    this.getUserInfo()
+    this.getSpeaks()
+    this.getSystemInfo()
+  },
   data() {
     return {
       formData: {},
-      arr: [
-        {
-          id: 1,
-          img: '../../assets/personal/user01.jpg',
-          replyName: '帅大叔',
-          beReplyName: '匿名',
-          content: '整体来说，一般般，知识一些小细节的地方写的不错。',
-          time: '2017-10-17 11:42:53',
-          replyBody: [
-            {
-              id: 3,
-              img: '',
-              replyName: '帅大叔',
-              beReplyName: '匿名',
-              content: '谢谢夸奖，我回再接再厉的',
-              time: '2017-10-17 11:42:53'
+      sysInfo: {},
+      info: {},
+      arr: []
+    }
+  },
+  methods: {
+    getUserInfo() {
+      getInfo()
+        .then(res => {
+          this.info = res.data
+          this.info.createTime = format(res.data.createTime)
+        })
+        .catch(err => {
+          this.$message.error(err.message)
+        })
+    },
+    send() {
+      console.log('this.formData.content:', this.formData.content)
+      if (this.formData.content == '' || this.formData.content == undefined) {
+        this.$message.error('请输入内容')
+      } else {
+        this.formData = Object.assign(
+          {
+            img: ' ../../assets/personal/user01.jpg',
+            replyName: this.name,
+            name: this.name
+          },
+          this.formData
+        )
+        save(this.formData)
+          .then(() => {
+            this.formData = {}
+            this.getSpeaks()
+          })
+          .catch(err => {
+            this.$message.error(err.message)
+          })
+      }
+    },
+    getSpeaks() {
+      all()
+        .then(res => {
+          this.arr = res.data.map(item => {
+            return {
+              ...item,
+              time: format(item.createTime)
             }
-          ]
-        }
-      ]
+          })
+        })
+        .catch(err => {
+          this.$message.error(err.message)
+        })
+    },
+    getSystemInfo() {
+      available()
+        .then(res => {
+          this.sysInfo = res.data.map(item => {
+            return {
+              ...item,
+              createTime: format(item.createTime)
+            }
+          })[0]
+        })
+        .catch(err => {
+          this.$message.error(err.message)
+        })
     }
   }
 }
@@ -190,23 +310,15 @@ export default {
   }
 }
 
-.container {
-  width: 1000px;
-}
 .commentbox {
-  width: 900px;
   margin: 20px auto;
   position: relative;
 }
 .comment-list {
-  width: 900px;
-  margin: 20px auto;
-  clear: both;
-  padding-top: 20px;
+  overflow: auto;
 }
 .comment-list .comment-info {
   position: relative;
-  margin-bottom: 20px;
   margin-bottom: 20px;
   border-bottom: 1px solid #ccc;
 }
@@ -215,7 +327,7 @@ export default {
   position: absolute;
 }
 .comment-list .comment-info header img {
-  width: 100%;
+  width: 80%;
   border-radius: 50%;
   padding: 5px;
 }
@@ -256,5 +368,25 @@ export default {
 .comment-list .comment-info .comment-right .reply-list .reply p span {
   padding-right: 2em;
   color: #aaa;
+}
+.clearfix:before,
+.clearfix:after {
+  display: table;
+  content: '';
+}
+.clearfix:after {
+  clear: both;
+}
+.left {
+  width: 40%;
+  margin-left: 1%;
+  display: inline-block;
+  position: absolute;
+}
+.right {
+  width: 56%;
+  display: inline-block;
+  position: relative;
+  left: 42%;
 }
 </style>
