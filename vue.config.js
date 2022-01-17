@@ -5,7 +5,8 @@ const resolve = function(dir) {
 
 module.exports = {
   publicPath:
-    process.env.NODE_ENV === 'production' ? '/vue-admin-webapp/' : '/',
+    // process.env.NODE_ENV === 'production' ? '/vue-admin-webapp/' : '/',
+    process.env.NODE_ENV === 'production' ? './' : '/',
   outputDir: 'dist',
   assetsDir: 'static',
   lintOnSave: true, // 是否开启eslint保存检测
