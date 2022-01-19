@@ -71,6 +71,9 @@
             <el-button type="warning" @click="toDetail(scope.row)"
               >详情</el-button
             >
+            <el-button type="primary" @click="toDownload(scope.row)"
+              >下载</el-button
+            >
             <el-button
               type="danger"
               @click="toDelete(scope.row)"
@@ -94,25 +97,38 @@
       </el-pagination>
     </el-card>
     <el-dialog title="上传" :visible.sync="upIsShow" class="diaForm">
-      <el-form ref="uploadForm" :model="formData" label-width="140px">
-        <el-form-item label="文件大小" prop="size">
+      <el-form
+        ref="uploadForm"
+        :model="formData"
+        :rules="uploadRules"
+        label-width="140px"
+      >
+        <el-form-item label="文件目录" prop="fileFolder">
+          <el-input type="text" v-model="formData.fileFolder"></el-input>
+        </el-form-item>
+        <el-form-item label="文件大小">
           <el-upload
+            ref="upload"
             class="upload-demo"
-            :action="uploadUrl"
-            :headers="headers"
+            action="no"
             :on-change="handleChange"
             :file-list="fileList"
+            :limit="1"
             :multiple="false"
+            :auto-upload="false"
             name="uploadFile"
           >
-            <el-button size="small" type="primary">点击上传</el-button>
-            <div slot="tip" class="el-upload__tip">
-              只能上传jpg/png文件，且不超过500kb
-            </div>
+            <el-button slot="trigger" size="small" type="primary"
+              >选取文件</el-button
+            >
           </el-upload>
+        </el-form-item>
+        <el-form-item label="文件描述" prop="desc">
+          <el-input type="text" v-model="formData.desc"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button @click="upIsShow = false">取消</el-button>
+          <el-button @click="submitUpload">确定</el-button>
         </el-form-item>
       </el-form>
     </el-dialog>
@@ -198,9 +214,9 @@
 </template>
 
 <script>
-import { update, del, page } from '@/api/file'
+import { upload, download, update, del, page } from '@/api/file'
 import { mapGetters } from 'vuex'
-import { format } from '@/utils/component'
+import { format, createAndDownloadFile } from '@/utils/component'
 import store from '@/store'
 export default {
   computed: {
@@ -241,6 +257,12 @@ export default {
           { required: true, message: '请输入文件路径', trigger: 'change' }
         ]
       },
+      uploadRules: {
+        fileFolder: [
+          { required: true, message: '请输入文件目录', trigger: 'blur' }
+        ],
+        desc: [{ required: true, message: '请输入描述信息', trigger: 'blur' }]
+      },
       fileList: [],
       uploadUrl: '',
       headers: {}
@@ -252,7 +274,7 @@ export default {
   activated() {
     this.getPageData()
     this.headers.auth = store.getters.token
-    this.uploadUrl = process.env.VUE_APP_BASE_API + '/file/upload?folder=other'
+    this.uploadUrl = process.env.VUE_APP_BASE_API + '/file/upload?folder='
   },
   filters: {
     statusText(val) {
@@ -326,7 +348,7 @@ export default {
               if (res.code == 200) {
                 this.$notify({
                   title: '成功',
-                  message: '已删除该用户',
+                  message: '已删除该文件',
                   type: 'success'
                 })
                 this.getPageData()
@@ -346,6 +368,46 @@ export default {
     toDetail(row) {
       this.formData = Object.assign({}, row)
       this.detailIsShow = true
+    },
+    toDownload(row) {
+      this.$confirm('确定下载?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          let param = {
+            folder: row.fileFolder,
+            filename: row.name
+          }
+          download(param)
+            .then(res => {
+              // let url = URL.createObjectURL(new Blob([res]))
+              // let link = document.createElement('a')
+              // link.style.display = 'none'
+              // link.href = url
+              // link.download = row.name
+              // document.body.appendChild(link)
+              // link.click()
+              
+              createAndDownloadFile(row.name, res)
+
+              this.$notify({
+                title: '成功',
+                message: '文件下载成功',
+                type: 'success'
+              })
+            })
+            .catch(err => {
+              this.$message.error(err)
+            })
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消下载'
+          })
+        })
     },
     // 编辑
     editTable(index, row) {
@@ -390,10 +452,33 @@ export default {
       })
     },
     handleChange(file, fileList) {
-      // console.log('file:', file)
-      this.fileList = fileList.slice(-3)
-      this.getPageData()
-      this.upIsShow = false
+      // console.log('file:', file, fileList)
+      this.fileList = fileList
+    },
+    submitUpload() {
+      this.$refs['uploadForm'].validate(valid => {
+        if (valid && this.fileList.length > 0) {
+          let param = new FormData()
+          param.append('uploadFile', this.fileList[0].raw)
+          param.append('desc', this.formData.desc)
+          upload(this.formData.fileFolder, param)
+            .then(() => {
+              this.$notify({
+                title: '成功',
+                message: '文件上传成功',
+                type: 'success'
+              })
+              this.getPageData()
+              this.fileList = []
+            })
+            .catch(err => {
+              this.$message.error(err)
+            })
+          this.upIsShow = false
+        } else {
+          this.$message.error('未选择文件')
+        }
+      })
     }
   }
 }

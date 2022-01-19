@@ -1,8 +1,14 @@
 import $axios from './index'
 
-export function upload(params) {
-  const url = '/file/upload'
-  return $axios.get(url, params)
+export function upload(folder, params) {
+  const url = '/file/upload?folder=' + folder
+  return $axios.uploadPost(url, params)
+}
+
+export function download(params) {
+  const url = '/file/download'
+  const headers = { responseType: 'blob' }
+  return $axios.get(url, params, headers)
 }
 
 export function remove(params) {

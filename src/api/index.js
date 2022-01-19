@@ -101,11 +101,25 @@ export default {
       }
     })
   },
-  get(url, params) {
+  uploadPost(url, data) {
+    return $axios({
+      method: 'post',
+      url,
+      // data: Qs.stringify(data),
+      data: data,
+      processData: false,
+      contentType: false,
+      headers: {
+        'Content-Type': 'multipart/form-data; charset=UTF-8'
+      }
+    })
+  },
+  get(url, params, headers) {
     return $axios({
       method: 'get',
       url,
-      params
+      params,
+      headers: { ...headers }
     })
   }
 }
