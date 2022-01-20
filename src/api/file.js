@@ -8,7 +8,7 @@ export function upload(folder, params) {
 export function download(params) {
   const url = '/file/download'
   const headers = { responseType: 'blob' }
-  return $axios.get(url, params, headers)
+  return $axios.post(url, params, headers)
 }
 
 export function remove(params) {

@@ -66,20 +66,34 @@
             <el-button
               type="primary"
               @click="editTable(scope.$index, scope.row)"
-              >编辑</el-button
             >
-            <el-button type="warning" @click="toDetail(scope.row)"
-              >详情</el-button
-            >
-            <el-button type="primary" @click="toDownload(scope.row)"
-              >下载</el-button
-            >
+              编辑
+            </el-button>
+            <el-button type="warning" @click="toDetail(scope.row)">
+              详情
+            </el-button>
+            <el-button type="primary" @click="toDownload(scope.row)">
+              下载
+            </el-button>
             <el-button
               type="danger"
               @click="toDelete(scope.row)"
               :disabled="rolevalue === 'admin' ? false : true"
               >删除</el-button
             >
+            <!-- <el-link
+              type="primary"
+              :href="
+                downloadUrl +
+                  scope.row.fileFolder +
+                  '&filename=' +
+                  scope.row.name
+              "
+              :download="scope.row.name"
+              style="margin-left: 10px;"
+              icon="el-icon-download"
+              >下载</el-link
+            > -->
           </template>
         </el-table-column>
       </el-table>
@@ -274,7 +288,7 @@ export default {
   activated() {
     this.getPageData()
     this.headers.auth = store.getters.token
-    this.uploadUrl = process.env.VUE_APP_BASE_API + '/file/upload?folder='
+    this.downloadUrl = process.env.VUE_APP_BASE_API + '/file/download?folder='
   },
   filters: {
     statusText(val) {
@@ -380,27 +394,30 @@ export default {
             folder: row.fileFolder,
             filename: row.name
           }
-          download(param)
-            .then(res => {
-              // let url = URL.createObjectURL(new Blob([res]))
-              // let link = document.createElement('a')
-              // link.style.display = 'none'
-              // link.href = url
-              // link.download = row.name
-              // document.body.appendChild(link)
-              // link.click()
-              
-              createAndDownloadFile(row.name, res)
-
-              this.$notify({
-                title: '成功',
-                message: '文件下载成功',
-                type: 'success'
-              })
-            })
-            .catch(err => {
-              this.$message.error(err)
-            })
+          // download(param)
+          //   .then(res => {
+          //     createAndDownloadFile(row.name, res)
+          //     this.$notify({
+          //       title: '成功',
+          //       message: '文件下载成功',
+          //       type: 'success'
+          //     })
+          //   })
+          //   .catch(err => {
+          //     this.$message.error(err)
+          //   })
+          let link = document.createElement('a')
+          link.href =
+            this.downloadUrl + param.folder + '&filename=' + param.filename
+          link.download = param.filename
+          link.style.display = 'none'
+          document.body.appendChild(link)
+          link.click()
+          this.$notify({
+            title: '成功',
+            message: '文件下载成功',
+            type: 'success'
+          })
         })
         .catch(() => {
           this.$message({
