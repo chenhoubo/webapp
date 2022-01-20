@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import {
   Button,
+  Link,
   Row,
   Col,
   Form,
@@ -53,6 +54,7 @@ Notification.install = () => {
 }
 
 Vue.use(Button)
+Vue.use(Link)
 Vue.use(Row)
 Vue.use(Col)
 Vue.use(Form)

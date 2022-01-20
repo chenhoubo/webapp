@@ -90,37 +90,22 @@ $axios.interceptors.response.use(
 )
 // get，post请求方法
 export default {
-  post(url, data, headers) {
+  post(url, data) {
     return $axios({
       method: 'post',
       url,
       // data: Qs.stringify(data),
       data: { ...data },
       headers: {
-        'Content-Type': 'application/json; charset=UTF-8',
-        ...headers
+        'Content-Type': 'application/json; charset=UTF-8'
       }
     })
   },
-  uploadPost(url, data) {
-    return $axios({
-      method: 'post',
-      url,
-      // data: Qs.stringify(data),
-      data: data,
-      processData: false,
-      contentType: false,
-      headers: {
-        'Content-Type': 'multipart/form-data; charset=UTF-8'
-      }
-    })
-  },
-  get(url, params, headers) {
+  get(url, params) {
     return $axios({
       method: 'get',
       url,
-      params,
-      headers: { ...headers }
+      params
     })
   }
 }

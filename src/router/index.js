@@ -137,6 +137,12 @@ export const asyncRoutes = [
         name: 'System-user',
         component: () => import('@/views/system/user-Setting'),
         meta: { title: '用户管理', icon: 'el-icon-user' }
+      },
+      {
+        path: 'file',
+        name: 'System-file',
+        component: () => import('@/views/system/file-Setting'),
+        meta: { title: '文件管理', icon: 'el-icon-files' }
       }
     ]
   },
