@@ -193,15 +193,9 @@ export default {
       diaIsShow: false,
       formData: {},
       editType: '',
-      options: [
-        { label: '启用', value: 0 },
-        { label: '关闭', value: 1 }
-      ],
+      options: [{ label: '启用', value: 0 }, { label: '关闭', value: 1 }],
       pids: [{ name: '一级目录', id: '0' }],
-      hiddens: [
-        { label: '否', value: false },
-        { label: '是', value: true }
-      ],
+      hiddens: [{ label: '否', value: false }, { label: '是', value: true }],
       rowIndex: 0,
       rules: {
         name: [{ required: true, message: '请输入名称', trigger: 'blur' }],

@@ -237,10 +237,7 @@ export default {
       examineIsShow: false,
       formData: {},
       editType: '',
-      options: [
-        { label: '上架', value: 0 },
-        { label: '下架', value: 1 }
-      ],
+      options: [{ label: '上架', value: 0 }, { label: '下架', value: 1 }],
       users: [],
       msgList: [],
       rowIndex: 0,

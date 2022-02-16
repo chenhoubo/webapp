@@ -228,9 +228,11 @@
 </template>
 
 <script>
-import { upload, download, update, del, page } from '@/api/file'
+// import { upload, download, update, del, page } from '@/api/file'
+import { upload, update, del, page } from '@/api/file'
 import { mapGetters } from 'vuex'
-import { format, createAndDownloadFile } from '@/utils/component'
+// import { format, createAndDownloadFile } from '@/utils/component'
+import { format } from '@/utils/component'
 import store from '@/store'
 export default {
   computed: {
@@ -251,14 +253,8 @@ export default {
       detailIsShow: false,
       formData: {},
       editType: '',
-      options: [
-        { label: '可用', value: 0 },
-        { label: '禁用', value: 1 }
-      ],
-      hiddens: [
-        { label: '否', value: false },
-        { label: '是', value: true }
-      ],
+      options: [{ label: '可用', value: 0 }, { label: '禁用', value: 1 }],
+      hiddens: [{ label: '否', value: false }, { label: '是', value: true }],
       rowIndex: 0,
       rules: {
         name: [{ required: true, message: '请输入名称', trigger: 'blur' }],

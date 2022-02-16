@@ -81,6 +81,42 @@ export const currencyRoutes = [
 /*动态添加routers*/
 export const asyncRoutes = [
   {
+    path: '/work',
+    name: 'Work',
+    component: Layout,
+    redirect: '/work/agency',
+    meta: {
+      title: '工单管理',
+      icon: 'el-icon-s-finance'
+    },
+    children: [
+      {
+        path: 'agency',
+        name: 'Work-agency',
+        component: () => import('@/views/work/agency'),
+        meta: { title: '代办工单', icon: 'el-icon-s-order' }
+      },
+      {
+        path: 'already',
+        name: 'Work-already',
+        component: () => import('@/views/work/already'),
+        meta: { title: '已办工单', icon: 'el-icon-s-order' }
+      },
+      {
+        path: 'type',
+        name: 'Work-type',
+        component: () => import('@/views/work/type'),
+        meta: { title: '类型设置', icon: 'el-icon-s-order' }
+      },
+      {
+        path: 'pool',
+        name: 'Work-pool',
+        component: () => import('@/views/work/pool'),
+        meta: { title: '工单池', icon: 'el-icon-s-order' }
+      }
+    ]
+  },
+  {
     path: '/order',
     name: 'Order',
     component: Layout,
